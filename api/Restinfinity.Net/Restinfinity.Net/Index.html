@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+    <script src="jquery-1.11.3.min.js"></script>
+    <script>
+        var methodTypes = [ "GET", "POST", "PUT", "DELETE" ];
+        var apiDocs;
+        $('document').ready(function () {
+            var uri = "http://localhost:61081/api/Help/";
+            webRequest(uri,loadServices);
+         
+            $('#services').on('change', loadMethods);
+            $('#methods').on('change', loadMethod);
+        });
+
+        function loadServices(res) {
+            //alert(JSON.stringify(res));
+            apiDocs = res;
+            var services = new Array();
+            $.each(res, function (index,value) {
+                services.push(value.Service);
+            });
+            //alert('[Service]' + JSON.stringify(services));
+            $.each($.unique(services), function (index, value) {
+                $('#services').append($("<option></option>").attr("value", value).text(value));
+            });
+
+            loadMethods();
+        }
+
+        function loadMethods() {
+            $('#methods').html('');
+            var service = $('#services').val();//$('#services:selected').text();
+            $.each(apiDocs, function (index, value) {
+                if (value.Service == service) {                   
+                    $('#methods').append($("<option></option>").attr("value", value.ApiId).text(value.ApiId));
+                }
+            });
+
+            loadMethod();
+        }
+
+        function loadMethod(){
+            var id = $('#methods').val();
+            var uri = "http://localhost:61081/api/Help/" + id;
+            webRequest(uri, loadMethodDetail);
+        }
+
+        function loadMethodDetail(res) {
+            var mtd = res.Methods[0];
+            $('#type').val(mtd.Name);
+            $('#path').val(mtd.Path);
+
+            clear();
+            var req = mtd.Request;
+            $('#req-uri-params').html(buildTable(req.UriParameters));
+            $('#req-headers').html(buildTable(req.Headers));
+            $('#req-body-params').html(buildTable(req.BodyParameters));
+            $('#req-sample-json').text(req.SampleJson);
+
+            var res = mtd.Response;
+            $('#res-headers').html(buildTable(res.Headers));
+            $('#res-body-params').html(buildTable(res.BodyParameters));
+            $('#res-sample-json').text(res.SampleJson);
+        }
+
+        function webRequest(uri, cb, method, data, headers){
+            if (method == undefined) method = 'GET';
+
+            var req = {
+                url: uri,
+                type: method,
+                success: cb
+            }
+
+            if (data != undefined)
+                req.data = data;
+
+            $.ajax(req);
+        }
+
+        function buildTable(kvp) {
+            var html = "<table><tr><th>Name</th><th>Type</th></tr>";
+            $.each(kvp, function (index, value) {
+                html += "<tr><td>k</td><td>v</td></tr>".replace("k",value.Name).replace("v",value.Type);
+            });
+            html += "</table>";
+            return html;
+        }
+
+        function clear() {
+            $('#req-uri-params').html('');
+            $('#req-headers').html('');
+            $('#req-body-params').html('');
+            $('#req-sample-json').text('');
+            $('#res-headers').html('');
+            $('#res-body-params').html('');
+            $('#res-sample-json').html('');
+        }
+    </script>
+</head>
+<body>
+    Services<select id="services"></select>
+    Methods<select id="methods"></select>
+    <div>
+        <div>
+            <input id="type" type="text">
+            <input id="path" type="text">
+        </div>
+        Request
+        <div>
+            <div id="req-uri-params"></div>
+            <div id="req-headers"></div>
+            <div id="req-body-params"></div>
+            <div id="req-sample-json"></div>
+        </div>
+        Response
+        <div>
+            <div id="res-headers"></div>
+            <div id="res-body-params"></div>
+            <div id="res-sample-json"></div>
+        </div>
+    </div>
+</body>
+</html>

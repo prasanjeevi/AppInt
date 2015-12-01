@@ -1,0 +1,469 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <SchemaVersion>2.0</SchemaVersion>
+        <ProjectGuid>{9b25e5ea-56c4-474d-a44e-fef817ee7ccd}</ProjectGuid>
+        <ProjectHome>..\..\Working\1.0.26\Arch_migration\TruMobi\</ProjectHome>
+        <ProjectView>ShowAllFiles</ProjectView>
+        <StartupFile>home.js</StartupFile>
+        <WorkingDirectory>.</WorkingDirectory>
+        <OutputPath>.</OutputPath>
+        <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+        <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+        <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+    <ItemGroup>
+        <Content Include="package.json" />
+        <Compile Include="home.js" />
+        <Compile Include="external\ExternalHelper.js" />
+        <Content Include="common\config\AuthenticationServiceConfig.json" />
+        <Content Include="common\config\ByPassSessionsConfig.json" />
+        <Content Include="common\config\CommonErrorCodes.json" />
+        <Content Include="common\config\DownloadServiceConfig.json" />
+        <Content Include="common\config\WebConfigValues.json" />
+        <Compile Include="common\modules\AppBuilder.js" />
+        <Compile Include="common\modules\AuthenticationServices.js" />
+        <Compile Include="common\modules\ByPassSessions.js" />
+        <Compile Include="common\modules\CollectionAudit.js" />
+        <Compile Include="common\modules\CommonConnect.js" />
+        <Compile Include="common\modules\CommonConstants.js" />
+        <Compile Include="common\modules\CommonErrors.js" />
+        <Compile Include="common\modules\CommonMethods.js" />
+        <Compile Include="common\modules\CommonTruBox.js" />
+        <Compile Include="common\modules\CryptoHelper.js" />
+        <Compile Include="common\modules\DownloadServices.js" />
+        <Compile Include="common\modules\EnumConstants.js" />
+        <Compile Include="common\modules\LDAPHelper.js" />
+        <Compile Include="common\modules\WebConfig.js" />
+        <Compile Include="common\modules\WebDAVHelper.js" />
+        <Content Include="external\config\ExternalErrorCodes.json" />
+        <Content Include="framework\config\devconfig.json" />
+        <Content Include="framework\config\productionconfig.json" />
+        <Compile Include="framework\errors\SystemErrors.js" />
+        <Compile Include="framework\router\route.js" />
+        <Compile Include="framework\util\AppSettings.js" />
+        <Compile Include="framework\util\ArchMigrationGel.js" />
+        <Compile Include="framework\util\Common.js" />
+        <Compile Include="framework\util\ConfigReader.js" />
+        <Compile Include="framework\util\FileHandler.js" />
+        <Compile Include="framework\util\GlobalErrorHandler.js" />
+        <Compile Include="framework\util\ResponseHeaders.js" />
+        <Compile Include="framework\util\Security.js" />
+        <Compile Include="framework\util\ServiceLogger.js" />
+        <Compile Include="framework\util\Thread.js" />
+        <Compile Include="framework\util\ThreadLocal.js" />
+        <Compile Include="framework\util\TruLogger.js" />
+        <Compile Include="framework\entity\to\response.js" />
+        <Compile Include="scheduler\purgeSession\PurgeSession.js" />
+        <Compile Include="scheduler\recompileApp\RecompileApp.js" />
+        <Content Include="scheduler\purgeSession\config\config.json" />
+        <Content Include="scheduler\recompileApp\config\config.json" />
+        <Content Include="services\androidmdm\config\ErrorCodes.json" />
+        <Content Include="services\androidmdm\config\ModuleConfig.json" />
+        <Content Include="services\androidmdm\config\uriconfig.json" />
+        <Compile Include="services\androidmdm\requesthandlers\androidmdmhandler.js" />
+        <Compile Include="services\androidmdm\requesthandlers\optionshandler.js" />
+        <Compile Include="services\androidmdm\router\route.js" />
+        <Compile Include="services\androidmdm\util\ErrorHandler.js" />
+        <Content Include="services\app\config\ErrorCodes.json" />
+        <Content Include="services\app\config\ModuleConfig.json" />
+        <Content Include="services\app\config\uriconfig.json" />
+        <Compile Include="services\app\requesthandlers\apphandler.js" />
+        <Compile Include="services\app\requesthandlers\optionshandler.js" />
+        <Compile Include="services\app\router\route.js" />
+        <Compile Include="services\app\util\ErrorHandler.js" />
+        <Content Include="services\appservice\config\ErrorCodes.json" />
+        <Content Include="services\appservice\config\ModuleConfig.json" />
+        <Content Include="services\appservice\config\uriconfig.json" />
+        <Compile Include="services\appservice\requesthandlers\apphandler.js" />
+        <Compile Include="services\appservice\requesthandlers\optionshandler.js" />
+        <Compile Include="services\appservice\requesthandlers\viphandler.js" />
+        <Compile Include="services\appservice\router\route.js" />
+        <Compile Include="services\appservice\util\ErrorHandler.js" />
+        <Content Include="services\authenticationservice\config\ErrorCodes.json" />
+        <Content Include="services\authenticationservice\config\ModuleConfig.json" />
+        <Content Include="services\authenticationservice\config\uriconfig.json" />
+        <Compile Include="services\authenticationservice\requesthandlers\connecthandler.js" />
+        <Compile Include="services\authenticationservice\requesthandlers\loginhandler.js" />
+        <Compile Include="services\authenticationservice\requesthandlers\optionshandler.js" />
+        <Compile Include="services\authenticationservice\router\route.js" />
+        <Compile Include="services\authenticationservice\util\ErrorHandler.js" />
+        <Content Include="services\connectservice\config\ErrorCodes.json" />
+        <Content Include="services\connectservice\config\ModuleConfig.json" />
+        <Content Include="services\connectservice\config\uriconfig.json" />
+        <Compile Include="services\connectservice\requesthandlers\connecthandler.js" />
+        <Compile Include="services\connectservice\requesthandlers\optionshandler.js" />
+        <Compile Include="services\connectservice\requesthandlers\profilehandler.js" />
+        <Compile Include="services\connectservice\router\route.js" />
+        <Compile Include="services\connectservice\util\ErrorHandler.js" />
+        <Content Include="services\devicemanagement\config\ErrorCodes.json" />
+        <Content Include="services\devicemanagement\config\ModuleConfig.json" />
+        <Content Include="services\devicemanagement\config\uriconfig.json" />
+        <Compile Include="services\devicemanagement\requesthandlers\devicehandler.js" />
+        <Compile Include="services\devicemanagement\requesthandlers\optionshandler.js" />
+        <Compile Include="services\devicemanagement\router\route.js" />
+        <Compile Include="services\devicemanagement\util\ErrorHandler.js" />
+        <Content Include="services\emailmanagement\config\ErrorCodes.json" />
+        <Content Include="services\emailmanagement\config\ModuleConfig.json" />
+        <Content Include="services\emailmanagement\config\uriconfig.json" />
+        <Compile Include="services\emailmanagement\requesthandlers\emailhandler.js" />
+        <Compile Include="services\emailmanagement\requesthandlers\optionshandler.js" />
+        <Compile Include="services\emailmanagement\router\route.js" />
+        <Compile Include="services\emailmanagement\util\ErrorHandler.js" />
+        <Content Include="services\fileaccess\config\ErrorCodes.json" />
+        <Content Include="services\fileaccess\config\ModuleConfig.json" />
+        <Content Include="services\fileaccess\config\uriconfig.json" />
+        <Compile Include="services\fileaccess\requesthandlers\fileaccesshandler.js" />
+        <Compile Include="services\fileaccess\requesthandlers\optionshandler.js" />
+        <Compile Include="services\fileaccess\requesthandlers\resourcehandler.js" />
+        <Compile Include="services\fileaccess\requesthandlers\viphandler.js" />
+        <Compile Include="services\fileaccess\router\route.js" />
+        <Compile Include="services\fileaccess\util\ErrorHandler.js" />
+        <Content Include="services\groups\config\ErrorCodes.json" />
+        <Content Include="services\groups\config\ModuleConfig.json" />
+        <Content Include="services\groups\config\uriconfig.json" />
+        <Compile Include="services\groups\requesthandlers\groupshandler.js" />
+        <Compile Include="services\groups\requesthandlers\optionshandler.js" />
+        <Compile Include="services\groups\router\route.js" />
+        <Compile Include="services\groups\util\ErrorHandler.js" />
+        <Content Include="services\licensemgmt\config\ErrorCodes.json" />
+        <Content Include="services\licensemgmt\config\ModuleConfig.json" />
+        <Content Include="services\licensemgmt\config\uriconfig.json" />
+        <Compile Include="services\licensemgmt\requesthandlers\licensehandler.js" />
+        <Compile Include="services\licensemgmt\requesthandlers\optionshandler.js" />
+        <Compile Include="services\licensemgmt\router\route.js" />
+        <Compile Include="services\licensemgmt\util\ErrorHandler.js" />
+        <Content Include="services\mimaccess\config\ErrorCodes.json" />
+        <Content Include="services\mimaccess\config\ModuleConfig.json" />
+        <Content Include="services\mimaccess\config\uriconfig.json" />
+        <Compile Include="services\mimaccess\requesthandlers\mimaccesshandler.js" />
+        <Compile Include="services\mimaccess\requesthandlers\optionshandler.js" />
+        <Compile Include="services\mimaccess\router\route.js" />
+        <Compile Include="services\mimaccess\util\ErrorHandler.js" />
+        <Content Include="services\newadminportalservice\config\ErrorCodes.json" />
+        <Content Include="services\newadminportalservice\config\ModuleConfig.json" />
+        <Content Include="services\newadminportalservice\config\uriconfig.json" />
+        <Compile Include="services\newadminportalservice\requesthandlers\appmixhandler.js" />
+        <Compile Include="services\newadminportalservice\requesthandlers\appshandler.js" />
+        <Compile Include="services\newadminportalservice\requesthandlers\categoryHandler.js" />
+        <Compile Include="services\newadminportalservice\requesthandlers\dashboardhandler.js" />
+        <Compile Include="services\newadminportalservice\requesthandlers\devicehandler.js" />
+        <Compile Include="services\newadminportalservice\requesthandlers\FileDownloader.js" />
+        <Compile Include="services\newadminportalservice\requesthandlers\grouphandler.js" />
+        <Compile Include="services\newadminportalservice\requesthandlers\optionshandler.js" />
+        <Compile Include="services\newadminportalservice\requesthandlers\profilehandler.js" />
+        <Compile Include="services\newadminportalservice\requesthandlers\reporthandler.js" />
+        <Compile Include="services\newadminportalservice\requesthandlers\resourcehandler.js" />
+        <Compile Include="services\newadminportalservice\requesthandlers\userhandler.js" />
+        <Compile Include="services\newadminportalservice\requesthandlers\viphandler.js" />
+        <Compile Include="services\newadminportalservice\router\route.js" />
+        <Compile Include="services\newadminportalservice\util\ErrorHandler.js" />
+        <Content Include="services\notificationservice\config\ErrorCodes.json" />
+        <Content Include="services\notificationservice\config\ModuleConfig.json" />
+        <Content Include="services\notificationservice\config\uriconfig.json" />
+        <Compile Include="services\notificationservice\requesthandlers\notificationhandler.js" />
+        <Compile Include="services\notificationservice\requesthandlers\optionshandler.js" />
+        <Compile Include="services\notificationservice\router\route.js" />
+        <Compile Include="services\notificationservice\util\ErrorHandler.js" />
+        <Content Include="services\profilemanagement\config\ErrorCodes.json" />
+        <Content Include="services\profilemanagement\config\ModuleConfig.json" />
+        <Content Include="services\profilemanagement\config\uriconfig.json" />
+        <Compile Include="services\profilemanagement\requesthandlers\optionshandler.js" />
+        <Compile Include="services\profilemanagement\requesthandlers\profilehandler.js" />
+        <Compile Include="services\profilemanagement\router\route.js" />
+        <Compile Include="services\profilemanagement\util\ErrorHandler.js" />
+        <Content Include="services\reportservice\config\ErrorCodes.json" />
+        <Content Include="services\reportservice\config\ModuleConfig.json" />
+        <Content Include="services\reportservice\config\uriconfig.json" />
+        <Compile Include="services\reportservice\requesthandlers\optionshandler.js" />
+        <Compile Include="services\reportservice\requesthandlers\reporthandler.js" />
+        <Compile Include="services\reportservice\router\route.js" />
+        <Compile Include="services\reportservice\util\ErrorHandler.js" />
+        <Content Include="services\resourceservice\config\ErrorCodes.json" />
+        <Content Include="services\resourceservice\config\ModuleConfig.json" />
+        <Content Include="services\resourceservice\config\uriconfig.json" />
+        <Compile Include="services\resourceservice\requesthandlers\optionshandler.js" />
+        <Compile Include="services\resourceservice\requesthandlers\resourcehandler.js" />
+        <Compile Include="services\resourceservice\router\route.js" />
+        <Compile Include="services\resourceservice\util\ErrorHandler.js" />
+        <Content Include="services\searchservice\config\ErrorCodes.json" />
+        <Content Include="services\searchservice\config\ModuleConfig.json" />
+        <Content Include="services\searchservice\config\uriconfig.json" />
+        <Compile Include="services\searchservice\requesthandlers\optionshandler.js" />
+        <Compile Include="services\searchservice\requesthandlers\searchhandler.js" />
+        <Compile Include="services\searchservice\router\route.js" />
+        <Compile Include="services\searchservice\util\ErrorHandler.js" />
+        <Content Include="services\settingsservice\config\ErrorCodes.json" />
+        <Content Include="services\settingsservice\config\ModuleConfig.json" />
+        <Content Include="services\settingsservice\config\uriconfig.json" />
+        <Compile Include="services\settingsservice\requesthandlers\settingshandler.js" />
+        <Compile Include="services\settingsservice\router\route.js" />
+        <Compile Include="services\settingsservice\util\ErrorHandler.js" />
+        <Content Include="services\ssoservice\config\ErrorCodes.json" />
+        <Content Include="services\ssoservice\config\ModuleConfig.json" />
+        <Content Include="services\ssoservice\config\uriconfig.json" />
+        <Compile Include="services\ssoservice\requesthandlers\optionshandler.js" />
+        <Compile Include="services\ssoservice\requesthandlers\ssohandler.js" />
+        <Compile Include="services\ssoservice\router\route.js" />
+        <Compile Include="services\ssoservice\util\ErrorHandler.js" />
+        <Content Include="services\tenantservice\config\ErrorCodes.json" />
+        <Content Include="services\tenantservice\config\ModuleConfig.json" />
+        <Content Include="services\tenantservice\config\uriconfig.json" />
+        <Compile Include="services\tenantservice\requesthandlers\optionshandler.js" />
+        <Compile Include="services\tenantservice\requesthandlers\tenanthandler.js" />
+        <Compile Include="services\tenantservice\router\route.js" />
+        <Compile Include="services\tenantservice\util\ErrorHandler.js" />
+        <Content Include="services\userservice\config\ErrorCodes.json" />
+        <Content Include="services\userservice\config\ModuleConfig.json" />
+        <Content Include="services\userservice\config\uriconfig.json" />
+        <Compile Include="services\userservice\requesthandlers\optionshandler.js" />
+        <Compile Include="services\userservice\requesthandlers\userhandler.js" />
+        <Compile Include="services\userservice\requesthandlers\viphandler.js" />
+        <Compile Include="services\userservice\router\route.js" />
+        <Compile Include="services\userservice\util\ErrorHandler.js" />
+        <Content Include="services\vpnmanagement\config\ErrorCodes.json" />
+        <Content Include="services\vpnmanagement\config\ModuleConfig.json" />
+        <Content Include="services\vpnmanagement\config\uriconfig.json" />
+        <Compile Include="services\vpnmanagement\requesthandlers\optionshandler.js" />
+        <Compile Include="services\vpnmanagement\requesthandlers\profilehandler.js" />
+        <Compile Include="services\vpnmanagement\router\route.js" />
+        <Compile Include="services\vpnmanagement\util\ErrorHandler.js" />
+        <Compile Include="test\newadminportalservice\UserTest.js" />
+        <Compile Include="TruDAL\APILayer\CollectionJSONSchemaAPI.js" />
+        <Compile Include="TruDAL\APILayer\FilesystemAPI.js" />
+        <Compile Include="TruDAL\APILayer\ParentAPI.js" />
+        <Content Include="TruDAL\Config\config.json" />
+        <Compile Include="TruDAL\DBFactory\dbFactory.js" />
+        <Content Include="TruDAL\Schema\json_schema.json" />
+        <Compile Include="TruDAL\APILayer\MasterDB\DeviceTenantAPI.js" />
+        <Compile Include="TruDAL\APILayer\MasterDB\TenantAPI.js" />
+        <Compile Include="TruDAL\APILayer\MasterDB\TenantAuditAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\AppAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\AppDownloadDetailsAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\AppMixAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\AppNotificationAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\AppRatingAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\AppScreenRepositoryAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\AppStoreDetailsAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\AppWrapTransDetailAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\CategoryAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\CertificateRepositoryAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\ConfigAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\DeviceAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\DeviceSpecAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\EmailCertRequestAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\EntityMasterAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\GeneralAuditAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\GroupAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\IconRepositoryAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\JobLogAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\JobMasterAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\LaunchpadAuditAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\MdmPushLogAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\NotificationAuditAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\ProductLicenseDetailsAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\ProfileAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\ResourceAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\ResourceDownloadDetailsAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\ResourceRatingAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\ResourceTypeAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\SessionAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\TemplateAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\TenantAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\UserAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\VipUserAPI.js" />
+        <Compile Include="TruDAL\APILayer\Trumobi_Dev\VpnPayloadValuesAPI.js" />
+        <Compile Include="TruDAL\Queries\MongoDB\BasicQueries\BaseQuery.js" />
+        <Content Include="TruDAL\Queries\MongoDB\common\MongoDBHelper.json" />
+        <Compile Include="TruDAL\Queries\MongoDB\QueryBuilder\QueryBuilder.js" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="common" />
+        <Folder Include="common\config" />
+        <Folder Include="common\modules" />
+        <Folder Include="external" />
+        <Folder Include="external\config" />
+        <Folder Include="framework" />
+        <Folder Include="framework\config" />
+        <Folder Include="framework\entity" />
+        <Folder Include="framework\entity\to" />
+        <Folder Include="framework\errors" />
+        <Folder Include="framework\router" />
+        <Folder Include="framework\util" />
+        <Folder Include="scheduler" />
+        <Folder Include="scheduler\purgeSession" />
+        <Folder Include="scheduler\purgeSession\config" />
+        <Folder Include="scheduler\recompileApp" />
+        <Folder Include="scheduler\recompileApp\config" />
+        <Folder Include="services" />
+        <Folder Include="services\androidmdm" />
+        <Folder Include="services\androidmdm\config" />
+        <Folder Include="services\androidmdm\requesthandlers" />
+        <Folder Include="services\androidmdm\router" />
+        <Folder Include="services\androidmdm\util" />
+        <Folder Include="services\app" />
+        <Folder Include="services\app\config" />
+        <Folder Include="services\app\requesthandlers" />
+        <Folder Include="services\app\router" />
+        <Folder Include="services\app\util" />
+        <Folder Include="services\appservice" />
+        <Folder Include="services\appservice\config" />
+        <Folder Include="services\appservice\requesthandlers" />
+        <Folder Include="services\appservice\router" />
+        <Folder Include="services\appservice\util" />
+        <Folder Include="services\authenticationservice" />
+        <Folder Include="services\authenticationservice\config" />
+        <Folder Include="services\authenticationservice\requesthandlers" />
+        <Folder Include="services\authenticationservice\router" />
+        <Folder Include="services\authenticationservice\util" />
+        <Folder Include="services\connectservice" />
+        <Folder Include="services\connectservice\config" />
+        <Folder Include="services\connectservice\requesthandlers" />
+        <Folder Include="services\connectservice\router" />
+        <Folder Include="services\connectservice\util" />
+        <Folder Include="services\devicemanagement" />
+        <Folder Include="services\devicemanagement\config" />
+        <Folder Include="services\devicemanagement\requesthandlers" />
+        <Folder Include="services\devicemanagement\router" />
+        <Folder Include="services\devicemanagement\util" />
+        <Folder Include="services\emailmanagement" />
+        <Folder Include="services\emailmanagement\config" />
+        <Folder Include="services\emailmanagement\requesthandlers" />
+        <Folder Include="services\emailmanagement\router" />
+        <Folder Include="services\emailmanagement\util" />
+        <Folder Include="services\fileaccess" />
+        <Folder Include="services\fileaccess\config" />
+        <Folder Include="services\fileaccess\requesthandlers" />
+        <Folder Include="services\fileaccess\router" />
+        <Folder Include="services\fileaccess\util" />
+        <Folder Include="services\groups" />
+        <Folder Include="services\groups\config" />
+        <Folder Include="services\groups\requesthandlers" />
+        <Folder Include="services\groups\router" />
+        <Folder Include="services\groups\util" />
+        <Folder Include="services\licensemgmt" />
+        <Folder Include="services\licensemgmt\config" />
+        <Folder Include="services\licensemgmt\requesthandlers" />
+        <Folder Include="services\licensemgmt\router" />
+        <Folder Include="services\licensemgmt\util" />
+        <Folder Include="services\mimaccess" />
+        <Folder Include="services\mimaccess\config" />
+        <Folder Include="services\mimaccess\requesthandlers" />
+        <Folder Include="services\mimaccess\router" />
+        <Folder Include="services\mimaccess\util" />
+        <Folder Include="services\newadminportalservice" />
+        <Folder Include="services\newadminportalservice\config" />
+        <Folder Include="services\newadminportalservice\requesthandlers" />
+        <Folder Include="services\newadminportalservice\router" />
+        <Folder Include="services\newadminportalservice\util" />
+        <Folder Include="services\notificationservice" />
+        <Folder Include="services\notificationservice\config" />
+        <Folder Include="services\notificationservice\requesthandlers" />
+        <Folder Include="services\notificationservice\router" />
+        <Folder Include="services\notificationservice\util" />
+        <Folder Include="services\profilemanagement" />
+        <Folder Include="services\profilemanagement\config" />
+        <Folder Include="services\profilemanagement\requesthandlers" />
+        <Folder Include="services\profilemanagement\router" />
+        <Folder Include="services\profilemanagement\util" />
+        <Folder Include="services\reportservice" />
+        <Folder Include="services\reportservice\config" />
+        <Folder Include="services\reportservice\requesthandlers" />
+        <Folder Include="services\reportservice\router" />
+        <Folder Include="services\reportservice\util" />
+        <Folder Include="services\resourceservice" />
+        <Folder Include="services\resourceservice\config" />
+        <Folder Include="services\resourceservice\requesthandlers" />
+        <Folder Include="services\resourceservice\router" />
+        <Folder Include="services\resourceservice\util" />
+        <Folder Include="services\searchservice" />
+        <Folder Include="services\searchservice\config" />
+        <Folder Include="services\searchservice\requesthandlers" />
+        <Folder Include="services\searchservice\router" />
+        <Folder Include="services\searchservice\util" />
+        <Folder Include="services\settingsservice" />
+        <Folder Include="services\settingsservice\config" />
+        <Folder Include="services\settingsservice\requesthandlers" />
+        <Folder Include="services\settingsservice\router" />
+        <Folder Include="services\settingsservice\util" />
+        <Folder Include="services\ssoservice" />
+        <Folder Include="services\ssoservice\config" />
+        <Folder Include="services\ssoservice\requesthandlers" />
+        <Folder Include="services\ssoservice\router" />
+        <Folder Include="services\ssoservice\util" />
+        <Folder Include="services\tenantservice" />
+        <Folder Include="services\tenantservice\config" />
+        <Folder Include="services\tenantservice\requesthandlers" />
+        <Folder Include="services\tenantservice\router" />
+        <Folder Include="services\tenantservice\util" />
+        <Folder Include="services\userservice" />
+        <Folder Include="services\userservice\config" />
+        <Folder Include="services\userservice\requesthandlers" />
+        <Folder Include="services\userservice\router" />
+        <Folder Include="services\userservice\util" />
+        <Folder Include="services\vpnmanagement" />
+        <Folder Include="services\vpnmanagement\config" />
+        <Folder Include="services\vpnmanagement\requesthandlers" />
+        <Folder Include="services\vpnmanagement\router" />
+        <Folder Include="services\vpnmanagement\util" />
+        <Folder Include="test" />
+        <Folder Include="test\newadminportalservice" />
+        <Folder Include="TruDAL" />
+        <Folder Include="TruDAL\APILayer" />
+        <Folder Include="TruDAL\APILayer\MasterDB" />
+        <Folder Include="TruDAL\APILayer\Trumobi_Dev" />
+        <Folder Include="TruDAL\Config" />
+        <Folder Include="TruDAL\DBFactory" />
+        <Folder Include="TruDAL\Queries" />
+        <Folder Include="TruDAL\Queries\MongoDB" />
+        <Folder Include="TruDAL\Queries\MongoDB\BasicQueries" />
+        <Folder Include="TruDAL\Queries\MongoDB\common" />
+        <Folder Include="TruDAL\Queries\MongoDB\QueryBuilder" />
+        <Folder Include="TruDAL\Schema" />
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
+    <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
+    <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+    <ProjectExtensions>
+        <VisualStudio>
+          <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+            <WebProjectProperties>
+              <UseIIS>False</UseIIS>
+              <AutoAssignPort>True</AutoAssignPort>
+              <DevelopmentServerPort>0</DevelopmentServerPort>
+              <DevelopmentServerVPath>/</DevelopmentServerVPath>
+              <IISUrl>http://localhost:48022/</IISUrl>
+              <NTLMAuthentication>False</NTLMAuthentication>
+              <UseCustomServer>True</UseCustomServer>
+              <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+              <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+            </WebProjectProperties>
+          </FlavorProperties>
+          <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+            <WebProjectProperties>
+              <StartPageUrl>
+              </StartPageUrl>
+              <StartAction>CurrentPage</StartAction>
+              <AspNetDebugging>True</AspNetDebugging>
+              <SilverlightDebugging>False</SilverlightDebugging>
+              <NativeDebugging>False</NativeDebugging>
+              <SQLDebugging>False</SQLDebugging>
+              <ExternalProgram>
+              </ExternalProgram>
+              <StartExternalURL>
+              </StartExternalURL>
+              <StartCmdLineArguments>
+              </StartCmdLineArguments>
+              <StartWorkingDirectory>
+              </StartWorkingDirectory>
+              <EnableENC>False</EnableENC>
+              <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+            </WebProjectProperties>
+          </FlavorProperties>
+        </VisualStudio>
+    </ProjectExtensions>
+</Project>

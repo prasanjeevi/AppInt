@@ -1,0 +1,470 @@
+﻿<!DOCTYPE html>
+<html id="top" lang="en" ng-app="appint">
+<head>
+    <title>AppInt</title>
+    <!--Styles-->
+    <link href="../lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../lib/jsoneditor/jsoneditor.css" rel="stylesheet">
+    <link href="../lib/css/angular-json-editor.css" rel="stylesheet">
+    <link href="../lib/css/ace-jsoneditor.css" rel="stylesheet">
+    <link href="../lib/ui-select/select.min.css" rel="stylesheet">
+    <link href="../lib/ui-select/selectize.default.css" rel="stylesheet">
+    <link href="css/base.css" rel="stylesheet">
+    <link href="../lib/jstree/themes/default/style.min.css" rel="stylesheet">
+    <link href="../lib/font-awesome-4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body ng-controller="AppIntCtrl">
+    
+    <!--Nav-->
+    <nav class="navbar navbar-fixed-top navbar-default ">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">App Integration Tool</a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#about">Docs</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
+
+    <!--Menu-->
+    <div class="container">
+        <div class="row">
+            <!--tools-->
+            <div class="col-sm-6">
+                <div class="input-group">
+                    <p class="text-muted">
+                        <input type="text" class="form-control" placeholder="Search Tools" ng-model="searchText">
+                    </p>
+                    <span class="input-group-addon" id="basic-addon1"><i class="glyphicon glyphicon-search"></i></span>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Project Tools</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12" role="main">
+                                <div class="bs-docs-section">
+                                    <div class="bs-glyphicons">
+                                        <ul id="tools-list" class="bs-glyphicons-list">
+                                            <li ng-repeat="tool in tools| filter:searchText | orderBy: 'name'" ng-click="showDialog(tool);">
+                                                <span class="{{tool.icon}}" aria-hidden="true"></span>
+                                                <span class="glyphicon-class">{{tool.name}}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--projects-->
+            <div class="col-sm-6">
+                <div class="input-group">
+                    <p class="text-muted">
+                        <input type="text" class="form-control" placeholder="Search Projects" ng-model="searchTextProjects">
+                    </p>
+                    <span class="input-group-addon" id="basic-addon1"><i class="glyphicon glyphicon-search"></i></span>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Projects</div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12" role="main">                               
+                                <div class="bs-docs-section">
+                                    <div class="bs-glyphicons">
+                                        <ul id="tools-list" class="bs-glyphicons-list">
+                                            <li ng-repeat="project in projects | filter:searchTextProjects | orderBy: 'name'" ng-click="showProjectExplorer(project.name)">
+                                                <span class="{{project.icon}}" aria-hidden="true"></span>
+                                                <span class="glyphicon-class">{{project.name}}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>                                        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Scripts-->
+    <script src="../lib/jsoneditor/jsoneditor.min.js"></script>
+    <script src="../lib/ace-builds/src-min/ace.js"></script>
+    <script src="../lib/js/angular.js"></script>
+    <script src="../lib/angular-ui-ace/ui-ace.js"></script>
+    <script src="../lib/js/jquery-1.11.3.min.js"></script>    
+    <script src="../lib/js/angular-json-editor.js"></script>
+    <script src="../lib/bootstrap/js/bootstrap.js"></script>
+    <script src="../lib/js/ui-bootstrap-tpls-0.14.3.js"></script>
+    <script src="../lib/js/angular-sanitize.min.js"></script>
+    <script src="../lib/ui-select/select.min.js"></script>   
+    <script src="../lib/jstree/jstree.min.js"></script>
+    <script src="../lib/jstree-directive/jsTree.directive.js"></script>
+    <script src="../lib/js/jquery.FileReader.js"></script>
+    <script src="../lib/js/ngFileReader.js"></script>
+    <script src="../lib/js/FileSaver.js"></script>
+    <script src="../lib/js/angular-file-saver.js"></script>
+    <script src="../lib/js/screenfull.js"></script>
+    <script src="../lib/js/angular-screenfull.min.js"></script>
+
+    <script src="js/app.js"></script>
+    
+    <!--Templates-->
+    <script type="text/ng-template" id="create-project.html">
+        <div class="panel panel-default">
+            <div class="panel-heading">Create Project</div>
+            <div class="panel-body">
+                <form>
+                    <div class="form-group">
+                        <label for="project-name">Name</label>
+                        <input type="text" class="form-control" id="project-name" autofocus="autofocus" placeholder="Project name" ng-model="projectName">
+                    </div>
+                    <button type="submit" class="btn btn-primary" ng-click="createProject()">Create</button>
+                    <button type="submit" class="btn btn-default" ng-click="cancel()">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="entity-editor.html">
+        <div class="panel panel-default">
+            <div class="panel-heading">Entity Editor</div>
+            <div class="panel-body">
+                <div json-editor model="json" options="options" style="height: 300px;" />
+                <form class="form-inline">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="entity-name" placeholder="Entity name" ng-model="entityName">
+                    </div>
+                    <div class="btn-group" uib-dropdown>
+                        <button id="split-button" type="button" class="btn btn-primary" ng-click="createEntity()">Create{{project != undefined ? ' in ' + project : ''}}</button>
+                        <button type="button" class="btn btn-primary" uib-dropdown-toggle>
+                            <span class="caret"></span>
+                            <span class="sr-only">Split button!</span>
+                        </button>
+                        <ul class="uib-dropdown-menu" role="menu" aria-labelledby="split-button">
+                            <li role="menuitem" ng-click="showDialog()"><a href="#">Choose project</a></li>
+                            <li role="menuitem" ng-click="createEntity()"><a href="#">Create in global</a></li>
+                        </ul>
+                    </div>      
+                    <div class="btn-group pull-right">                       
+                        <button class="btn btn-info glyphicon glyphicon-folder-open btn-file" title="Browse json" ng-file-reader read-method="readMethod" on-readed="onReaded(event,file)"></button>
+                        <button class="btn btn-info glyphicon glyphicon-download" title="Download json" ng-click="download()"></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </script>
+    
+    <script type="text/ng-template" id="choose-project.html">
+        <div class="panel panel-default">
+            <div class="panel-heading">Choose Project</div>
+            <div class="panel-body">
+                <ui-select ng-model="project.selected" theme="selectize" ng-disabled="disabled" ng-init="getProjects()" on-select="projectSelected()">
+                    <ui-select-match placeholder="Select or search project">{{$select.selected}}</ui-select-match>
+                    <ui-select-choices repeat="project in projects | filter: $select.search">
+                        <span ng-bind-html="project | highlight: $select.search"></span>
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+        </div>
+    </script>
+    
+    <script type="text/ng-template" id="choose-entity.html">
+        <div class="panel panel-default">
+            <div class="panel-heading">Choose Entity</div>
+            <div class="panel-body">
+                <ui-select ng-model="project.selected" theme="selectize" ng-disabled="disabled" ng-init="getProjects()" on-select="getEntities($select.selected)">
+                    <ui-select-match placeholder="Select or search project">{{$select.selected}}</ui-select-match>
+                    <ui-select-choices repeat="project in projects | filter: $select.search">
+                        <span ng-bind-html="project | highlight: $select.search"></span>
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+            <div class="panel-body">
+                <ui-select ng-model="entity.selected" theme="selectize" ng-disabled="disabled" on-select="entitySelected()">
+                    <ui-select-match placeholder="Select or search entity">{{$select.selected}}</ui-select-match>
+                    <ui-select-choices repeat="entity in entities | filter: $select.search">
+                        <span ng-bind-html="entity | highlight: $select.search"></span>
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+        </div>
+    </script>
+    
+    <script type="text/ng-template" id="create-service.html">
+        <div class="panel panel-default">
+            <div class="panel-heading">Create Service</div>
+            <div class="panel-body">
+                <div class="form-inline">
+                    <label for="service">Service</label>
+                    <input type="text" class="form-control" id="service" placeholder="Service name" ng-model="service.name">
+                    <div class="btn-group" >
+                        <label ng-repeat="method in service.methods" class="btn btn-default" ng-model="method.enabled" uib-btn-checkbox ng-click="selectMethod()">{{method.name | uppercase}}</label>
+                    </div>
+                    <button class="btn btn-default" ng-click="showDialog()">{{service.project == undefined ? 'Choose Project' : service.project}}</button>
+                    <button class="btn btn-default" ng-click="showEntity()">{{entity == undefined ? 'Choose Entity' : entity}}</button>
+                </div>               
+                <uib-tabset>
+                    <uib-tab ng-repeat="method in service.methods | filter:{ enabled: true}" heading="{{method.name | uppercase}}" ng-init="modelIndex = $index" >
+                        <p>Request Params</p>    
+                        <div class="form-inline">
+                            <input type="text" class="form-control" placeholder="param" ng-model="service.methods[$index].param">
+                            <select class="form-control" ng-model="service.methods[$index].type" ng-init="service.methods[$index].type = (entity == undefined ? 'string' : entity)">
+                                <option ng-if="entity != undefined">{{entity}}</option>
+                                <option>string</option>
+                                <option>int</option>
+                                <option>bool</option>
+                            </select>
+                            <button class="btn btn-default" ng-click="addReqParam($index)">+</button>
+                            <table class="table table-bordered">
+                                <tr ng-repeat="rp in service.methods[$index].request.uriParameters">
+                                    <td>{{ rp.name }}</td>
+                                    <td>{{ rp.type }}</td>
+                                    <td><button ng-click="removeReqParam($index,modelIndex)" class="btn btn-default fa fa-trash-o"></button></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <p>Response Param</p>
+                        <div class="form-inline">
+                            <select class="form-control" ng-model="service.methods[$index].response.type" ng-init="service.methods[$index].response={};service.methods[$index].response.type = (entity == undefined ? 'string' : entity)">
+                                <option ng-if="entity != undefined">{{entity}}</option>
+                                <option>string</option>
+                                <option>int</option>
+                                <option>bool</option>
+                                <option>void</option>
+                            </select>
+                        </div>
+                        <div class="btn-margin">
+                            <button class="btn btn-default" ng-click="generateCode()">Generate</button>
+                            <button class="btn btn-default" ng-click="showCode()">View</button>
+                            <button class="btn btn-primary" ng-click="createService()">Create</button>
+                        </div>
+                    </uib-tab>                    
+                </uib-tabset>                
+            </div>
+        </div>
+    </script>
+    
+    <script type="text/ng-template" id="project-explorer.html">
+        <div class="row" ng-init="getProjectDetail()">
+            <!--proj explorer-->
+            <div class="col-sm-12" id="proj-exp">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Project Explorer</div>
+                    <div class="panel-body">
+                        <div class="form-inline">
+                            <label for="project">Project</label>
+                            <input type="text" class="form-control" id="project" placeholder="Project name" ng-model="projectName">
+                            <label for="package">Package</label>
+                            <input type="text" class="form-control" id="package" placeholder="Package name" ng-model="projectName">
+                            <button class="btn btn-default">Save</button>
+                        </div>     
+                        <div class="row">
+                            <div class="col-md-6" role="main">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Services<button class="btn btn-primary pull-right">Create</button></div>
+                                    <div class="panel-body">
+                                        <div>
+                                            <button class="btn btn-info btn-xs" style="margin:0 0 2px 2px" ng-repeat="service in services" ng-click="getCode(service.id)">{{service.text}}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" role="main">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Entities<button class="btn btn-primary pull-right">Create</button></div>
+                                    <div class="panel-body">
+                                        <div>
+                                            <button class="btn btn-info btn-xs" style="margin:0 0 2px 2px" ng-repeat="entity in entities" ng-click="getCode(entity.id)">{{entity.text}}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3" role="main">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Utilites<button class="btn btn-primary pull-right">Create</button></div>
+                                    <div class="panel-body">
+                                        <button class="btn btn-info btn-xs" style="margin:0 0 2px 2px" ng-repeat="utility in utilities" ng-click="getCode(utility.id)">{{utility.text}}</button>
+                                        <button class="btn btn-default btn-xs">Settings</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3" role="main">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Database</div>
+                                    <div class="panel-body">
+                                        <button class="btn btn-default">Connection</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3" role="main">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Build</div>
+                                    <div class="panel-body">
+                                        <button class="btn btn-default">Build</button>
+                                        <button class="btn btn-default">Settings</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3" role="main">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Deploy</div>
+                                    <div class="panel-body">
+                                        <button class="btn btn-default">Deploy</button>
+                                        <button class="btn btn-default">Server</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="file-explorer.html">        
+        <div class="row">
+            <!--file explorer-->
+            <div class="col-sm-12" id="proj-exp">
+                <div class="panel panel-default">
+                    <div class="panel-heading">File Explorer</div>
+                    <div class="panel-body" style="height:400px">                        
+                        <div id="sidebar_wrapper">
+                            <div">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="tree-browser">
+                                            <js-tree tree-events="select_node:nodeSelected"
+                                                     tree-ajax="{{service}}"
+                                                     tree-core="tree_core"
+                                                     tree-plugins="dnd"></js-tree>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 file-viewer">
+                                        <div ui-ace="aceOption" ng-model="fileViewer"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    <div id="sidebar-toggle"></div>
+                    <div id="container"></div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="code-editor.html">
+        <div id="code-editor" ngsf-fullscreen>
+            <p>
+                &nbsp;&nbsp;Code Viewer > Project > Service.cs
+                <button class="btn btn-info glyphicon glyphicon-resize-small pull-right" ngsf-toggle-fullscreen></button>
+                <button class="btn btn-primary pull-right" ng-click="save()">Save</button>
+            </p>
+            <form class="form-inline">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="file-name" placeholder="{{name}} name" ng-model="fileName">
+                </div>
+                <div class="btn-group" uib-dropdown>
+                    <button id="split-button" type="button" class="btn btn-primary" ng-click="createFile()">Create{{project != undefined ? ' in ' + project : ''}}</button>
+                    <button type="button" class="btn btn-primary" uib-dropdown-toggle>
+                        <span class="caret"></span>
+                        <span class="sr-only">Split button!</span>
+                    </button>
+                    <ul class="uib-dropdown-menu" role="menu" aria-labelledby="split-button">
+                        <li role="menuitem" ng-click="showDialog()"><a href="#">Choose project</a></li>
+                        <li role="menuitem" ng-click="createFile()"><a href="#">Create in global</a></li>
+                    </ul>
+                </div>
+            </form>
+            <div ui-ace="aceOption" ng-model="fileViewer"></div>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="db-manager.html">
+        <div class="panel panel-default" id="db-manager">
+            <div class="panel-heading">Data Manager</div>
+            <div class="panel-body">
+                <form role="form">
+                    <div class="form-group">
+                        <label for="project" class="control-label col-sm-2">Project</label>
+                        <div class="col-sm-10">
+                            <ui-select ng-model="project.selected" theme="selectize" ng-disabled="disabled" ng-init="getProjects()" on-select="projectSelected()">
+                                <ui-select-match placeholder="Select or search project">{{$select.selected}}</ui-select-match>
+                                <ui-select-choices repeat="project in projects | filter: $select.search">
+                                    <span ng-bind-html="project | highlight: $select.search"></span>
+                                </ui-select-choices>
+                            </ui-select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="connection" class="control-label col-sm-2">Connection</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="connection" autofocus="autofocus" placeholder="Project name" ng-model="projectName">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="connection" class="control-label col-sm-2">Server</label>
+                        <div class="btn-group col-sm-10">
+                            <label class="btn btn-default" ng-model="server" uib-btn-radio="'mssql'">MSSQL</label>
+                            <label class="btn btn-default" ng-model="server" uib-btn-radio="'mongo'">MONGO</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="server-name" class="col-sm-2">Name/IP</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="server-name" autofocus="autofocus" placeholder="server name/ip" ng-model="serverName">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="port" class="control-label col-sm-2">Port</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" id="port" autofocus="autofocus" placeholder="port no" ng-model="port">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="username" class="control-label col-sm-2">Username</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="username" autofocus="autofocus" placeholder="username" ng-model="username">
+                        </div>
+                        <label for="username" class="control-label col-sm-2">Password</label>
+                        <div class="col-sm-4">
+                            <input type="password" class="form-control" id="username" autofocus="autofocus" placeholder="username" ng-model="username">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="project" class="control-label col-sm-2">Database</label>
+                        <ui-select class="col-xs-10" ng-model="project.selected" theme="selectize" ng-disabled="disabled" ng-init="getProjects()" on-select="projectSelected()">
+                            <ui-select-match placeholder="Select or search project">{{$select.selected}}</ui-select-match>
+                            <ui-select-choices repeat="project in projects | filter: $select.search">
+                                <span ng-bind-html="project | highlight: $select.search"></span>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-offset-2 col-xs-10">
+                                <button type="submit" class="btn btn-info" ng-click="createProject()">Test Connection</button>
+                                <button type="submit" class="btn btn-primary" ng-click="createProject()">Save</button>
+                                <button type="submit" class="btn btn-default" ng-click="cancel()">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </script>
+</body>
+</html>
