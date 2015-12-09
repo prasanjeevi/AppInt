@@ -15,9 +15,7 @@ using Xamasoft.JsonClassGenerator.CodeWriters;
 namespace Xamasoft.JsonClassGenerator
 {
     public class JsonClassGenerator : IJsonClassGeneratorConfig
-    {
-
-
+    {        
         public string Example { get; set; }
         public string TargetFolder { get; set; }
         public string Namespace { get; set; }
@@ -36,13 +34,14 @@ namespace Xamasoft.JsonClassGenerator
         public bool AlwaysUseNullableValues { get; set; }
         public bool ExamplesInDocumentation { get; set; }
         public bool AutoMerge { get; set; }
+        public bool GenerateIdField { get; set; }
 
         private PluralizationService pluralizationService = PluralizationService.CreateService(new CultureInfo("en-us"));
 
         private bool used = false;
         public bool UseNamespaces { get { return Namespace != null; } }
 
-        public void GenerateClasses()
+        public IEnumerable<string> GenerateClasses()
         {
             if (CodeWriter == null) CodeWriter = new CSharpCodeWriter();
             if (ExplicitDeserialization && !(CodeWriter is CSharpCodeWriter)) throw new ArgumentException("Explicit deserialization is obsolete and is only supported by the C# provider.");
@@ -113,7 +112,7 @@ namespace Xamasoft.JsonClassGenerator
             {
                 WriteClassesToFile(OutputStream, Types);
             }
-
+            return Types.Select(n => n.AssignedName);
         }
 
         private void WriteClassesToFile(string path, IEnumerable<JsonType> types)
@@ -145,6 +144,15 @@ namespace Xamasoft.JsonClassGenerator
         {
             var jsonFields = new Dictionary<string, JsonType>();
             var fieldExamples = new Dictionary<string, IList<object>>();
+
+            if (GenerateIdField)
+            {
+                jsonFields.Add("id", new JsonType(this, JsonTypeEnum.Integer));
+                var token = JToken.Parse("0").Value<object>();
+                var objList = new List<object>();
+                objList.Add(token);
+                fieldExamples["id"] = objList;
+            }
 
             var first = true;
 

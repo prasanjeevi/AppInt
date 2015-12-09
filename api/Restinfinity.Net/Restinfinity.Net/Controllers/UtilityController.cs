@@ -1,59 +1,66 @@
 ﻿using Restinfinity.Net.Models;
+using Restinfinity.Net.Utility;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+using System.Text;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
 namespace Restinfinity.Net.Controllers
 {
-    [EnableCors(origins: "http://localhost:8000", headers: "*", methods: "*")]
+    [EnableCors(origins: Config.Orgins, headers: "*", methods: "*")]
     public class UtilityController : ApiController
     {
-        string projectRepository = @"E:\AppInt\project-repository\";
-
-        public object IO { get; private set; }
-
-        // GET: api/Utility
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET: api/Utility/5
-        public string Get(int id)
-        {
-            return "value";
-        }
-
         // POST: api/Utility
-        public void Post([FromBody]Entity utility)
+        public IHttpActionResult Post([FromBody]Entity utility)
         {
             var project = string.IsNullOrEmpty(utility.Project) ? "Global" : utility.Project;
-            var path = Path.Combine(projectRepository, project, "Utility");
+            var path = Path.Combine(Config.ProjectRepository, project, Config.Utility);
 
             try
             {
                 Directory.CreateDirectory(path);
-                System.IO.File.WriteAllText(Path.Combine(path, utility.Name + ".cs"), utility.Content);
+                System.IO.File.WriteAllText(Path.Combine(path, utility.Name + ".cs"), 
+                    utility.Content.Replace("ProjectName.", utility.Project + "." )
+                        .Replace("class ClassName",  "class " + utility.Name.Capitalize())
+                    );
+                return Ok("Utility created successfully");
             }
-            catch
+            catch(Exception ex)
             {
-
+                return InternalServerError(ex);
             }
         }
 
-        // PUT: api/Utility/5
-        public void Put(int id, [FromBody]string value)
+        //GET: api/Utility
+        public string Get()
         {
+            return getTemplate();
         }
 
-        // DELETE: api/Utility/5
-        public void Delete(int id)
+        string getTemplate()
         {
+            StringBuilder template = new StringBuilder();
+            template.AppendLine("using System;");
+            template.AppendLine("using System.Collections.Generic;");
+            template.AppendLine("using System.Linq;");
+            template.AppendLine("using System.Web;");
+            template.AppendLine();
+            template.AppendLine("using ProjectName.Models;");
+            template.AppendLine("using ProjectName.Utility;");
+            template.AppendLine("using ProjectName.DAL;");
+            template.AppendLine();
+            template.AppendLine("namespace ProjectName." + Config.Utility);
+            template.AppendLine("{");
+            template.AppendLine("public class ClassName");
+            template.AppendLine("{");
+            template.AppendLine("public static string FunctionName()");
+            template.AppendLine("{");
+            template.AppendLine("return string.Empty;");
+            template.AppendLine("}");
+            template.AppendLine("}"); //Class end
+            template.AppendLine("}"); //Namespace end
+            return template.ToString();
         }
     }
 }

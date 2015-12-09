@@ -11,5 +11,7 @@ namespace Restinfinity.Net.Models
         public string Json { get; set; }
         public string Content { get; set; }
         public string Project { get; set; }
+
+        public bool EnableDB { get; set; }
     }
 }

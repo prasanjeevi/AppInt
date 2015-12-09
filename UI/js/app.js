@@ -3,11 +3,32 @@ var app = angular.module('appint',
     ['ui.bootstrap', 'angular-json-editor', 'ngSanitize', 'ui.select', 'jsTree.directive',
         'ui.ace', 'ngFileReader', 'ngFileSaver', 'angularScreenfull']);
 
-//var host = 'http://localhost:9229/appint/api';
-var host = 'http://localhost:61081/api';
+app.factory("prompt", function ($window, $q) {
+
+    // Define promise-based prompt() method.
+	function prompt(message, defaultValue) {
+	    var defer = $q.defer();
+
+		// The native prompt will return null or a string.
+		var response = $window.prompt(message, defaultValue);
+
+		if (response === null) {
+			defer.reject();
+		} else {
+			defer.resolve(response);
+		}
+
+		return (defer.promise);
+	}
+
+	return (prompt);
+});
+
+var host_iis = 'http://localhost:9229/appint/api';  //For IIS
+var host = 'http://localhost:61081/api';      //For debuging
 
 //*************************************AppIntCtrl******************************
-app.controller('AppIntCtrl', function ($scope, $uibModal, $http, $log) {
+app.controller('AppIntCtrl', function ($scope, $http, $uibModal) {
 
     //****Tools*****
     $scope.tools = [
@@ -32,26 +53,12 @@ app.controller('AppIntCtrl', function ($scope, $uibModal, $http, $log) {
             size: 'lg'
         },
         {
-            name: 'File explorer',
-            icon: 'fa fa-folder-o',
-            src: 'file-explorer.html',
-            ctrl: 'FileCtrl',
-            size: 'lg'
-        },
-        {
-            name: 'Library manager',
-            icon: 'glyphicon glyphicon-book',
-            src: 'file-explorer.html',
+            name: 'create utility',
+            icon: 'fa fa-suitcase',
+            src: 'code-editor.html',
             ctrl: 'FileCtrl',
             size: 'lg',
-            param: { name: 'lib' }
-        },
-        {
-            name: 'Rest client',
-            icon: 'fa fa-globe',
-            src: 'file-explorer.html',
-            ctrl: 'FileCtrl',
-            size: 'lg'
+            param: { name: 'utility', title:'Utility Code Editor' }
         },
         {
             name: 'data manager',
@@ -61,12 +68,26 @@ app.controller('AppIntCtrl', function ($scope, $uibModal, $http, $log) {
             size: 'md'
         },
         {
-            name: 'create utility',
-            icon: 'fa fa-suitcase',
-            src: 'code-editor.html',
+            name: 'File explorer',
+            icon: 'fa fa-folder-o',
+            src: 'file-explorer.html',
+            ctrl: 'FileCtrl',
+            size: 'lg'
+        },
+        {
+            name: 'Library explorer',
+            icon: 'glyphicon glyphicon-book',
+            src: 'file-explorer.html',
             ctrl: 'FileCtrl',
             size: 'lg',
-            param: {name: 'utility'}
+            param: { name: 'lib', service: host + '/file/lib', title:'Library explorer' }
+        },
+        {
+            name: 'Rest client',
+            icon: 'fa fa-globe',
+            src: 'file-explorer.html',
+            ctrl: 'FileCtrl',
+            size: 'lg'
         },
         {
             name: 'iis explorer',
@@ -74,62 +95,74 @@ app.controller('AppIntCtrl', function ($scope, $uibModal, $http, $log) {
             src: 'file-explorer.html',
             ctrl: 'FileCtrl',
             size: 'lg',
-            param: { name:'iis', service: host + '/server' }
+            param: { name: 'iis', service: host + '/server', title: 'IIS explorer' }
         }
     ];
 
-    $scope.showDialog = function (tool) {
-        if (tool.size == undefined) tool.size = 'md';
+    //App -> Tools
+    $scope.showTool = function (tool) {
         var modalInstance = $uibModal.open({
             templateUrl: tool.src,
             controller: tool.ctrl,
-            size: tool.size,
+            size: tool.size || 'md',
             resolve: {
                 param: tool.param
             }
         });
+
+        if (tool.src == 'create-project.html') {
+            //on -> createProjectSuccess -> Refresh projects
+            modalInstance.result.then(function (project) {
+                $scope.projects.push({ name: project, icon: 'l l-' + project.substr(0, 1).toLowerCase() });
+            });
+        }
     }
+
 
     //****Projects****
     $scope.projects = [];
 
-    var uri = host + '/Project/';
+    var uri = host + '/Project';
 
     $http.get(uri, config).then(getProjectsSuccess, errorCallback);
     
-    function getProjectsSuccess(data) {
-        angular.forEach(data.data, function (value) {
+    function getProjectsSuccess(res) {
+        angular.forEach(res.data, function (value) {
             $scope.projects.push({ name: value, icon: 'l l-' + value.substr(0, 1).toLowerCase() });
         });
     }
     
-    $scope.showProjectExplorer = function (id) {
+    //App -> Project Explorer
+    $scope.showProjectExplorer = function (project){
         var modalInstance = $uibModal.open({
             templateUrl: 'project-explorer.html',
             controller: 'ProjectCtrl',
             size: 'lg',
-            resolve:{param: function () {
-                return { 'project': id };
-            }}
+            resolve: {
+                param: function () {
+                    return { 'project': project };
+                }
+            }
         });
     }
 });
 
 //*************************************ProjectCtrl*****************************
-app.controller('ProjectCtrl', function ($scope, $http, $uibModalInstance, $log, param, $uibModal) {
-    $scope.server = 'mssql';
-    var uri = host + '/Project/';
+app.controller('ProjectCtrl', function ($scope, $http, $uibModal, $uibModalInstance, prompt, param) {
+    
+    var uri = host + '/Project';
 
-    if (param != undefined) $scope.projectName = param.project;
-
+    //param from Project Explorer Flow
+    if (param != undefined) $scope.project = param.project;
+        
     $scope.createProject = function () {
-        var data = new String($scope.projectName);
-        $http.post(uri, data, config).then(projectCreated, errorCallback);  
+        var data = new String($scope.project);
+        $http.post(uri, data, config).then(createProjectSuccess, errorCallback);
     }
 
-    function projectCreated(data) {
-        alert(data.data);
-        $uibModalInstance.dismiss();
+    function createProjectSuccess(res) {
+        alert(res.data);
+        $uibModalInstance.close($scope.project); //To -> AppIntCtrl
     }
 
     $scope.cancel = function () {
@@ -144,39 +177,45 @@ app.controller('ProjectCtrl', function ($scope, $http, $uibModalInstance, $log, 
         $http.get(uri, config).then(getProjectsSuccess, errorCallback);
     }
 
-    function getProjectsSuccess(data){
-        $scope.projects = data.data;
+    function getProjectsSuccess(res){
+        $scope.projects = res.data;
     }
 
-    $scope.project = {};
-    $scope.project.selected = undefined;
-
-    $scope.projectSelected = function () {
-        $uibModalInstance.close($scope.project.selected);
+    $scope.projectSelected = function (project) {
+        $uibModalInstance.close(project);
     }
 
+
+    //****ProjectExplorer****
     $scope.getProjectDetail = function () {
-        $http.get(uri + $scope.projectName, config).then(getProjectDetailSuccess, errorCallback);
+        $http.get(uri + "/" + $scope.project, config).then(getProjectDetailSuccess, errorCallback);
     }
 
     function getProjectDetailSuccess(res) {
         $scope.services = res.data.services;
         $scope.entities = res.data.entities;
         $scope.utilities = res.data.utilities;
+        $scope.dals = res.data.dal;
+        $scope.configs = res.data.configs;
     }
 
-    $scope.getCode = function (id) {
-        $http.get(host + '/File/Resource?resource=' + id, config).then(showCode, errorCallback);
+    //ProjectExplorer -> Show Code
+    $scope.showCode = function (id) {
+        $http.get(host + '/File/Resource?resource=' + id, config).then(showCodeSuccess, errorCallback);
     }
 
-    function showCode(data) {
+    function showCodeSuccess(res) {
         var modalInstance = $uibModal.open({
             templateUrl: "code-editor.html",
             size: "lg",
             controller: "FileCtrl",
             resolve: {
                 param: function () {
-                    return { 'code': data.data };
+                    if (res.config.url.indexOf('project-repository') != -1)
+                        return { code: res.data, title: 'Code Viewer' + res.config.url.split('project-repository')[1].replace(/\\/g, '>') };
+                    else if (res.config.url.indexOf('builds') != -1)
+                        return { code: res.data, title: 'Code Viewer' + res.config.url.split('builds')[1].replace(/\\/g, '>') };
+                    else return { code: res.data, title: 'Code Viewer' + res.config.url };
                 }
             }
         });
@@ -186,42 +225,106 @@ app.controller('ProjectCtrl', function ($scope, $http, $uibModalInstance, $log, 
             $scope.code = code;
         });
     };
+
+
+    //Data Manager
+    $scope.serverType = 'mssql';
+    $scope.port = 1433;
+    $scope.dbContext = 'GlobalContext'
+
+    $scope.setDBContext = function (project) {
+        $scope.project = project;
+        $scope.dbContext = project + 'Context';
+        $scope.dbs = ["Create DB " + project];
+    }
+    $scope.db = {};
+    $scope.getDBs = function () {
+        var data = {};
+        data.Name = $scope.dbContext;
+        data.Server = $scope.server;
+        data.Port = $scope.port;
+        data.Username = $scope.username;
+        data.Password = $scope.password;
+        data.Project = $scope.project;
+        data.Database = String($scope.db.selected).indexOf('Create DB ') == -1 ? $scope.db.selected : 'master';
+        $http.post(host + '/Data/TestConnection', data, config).then(getDBsSuccess, errorCallback);
+    }
+
+    function getDBsSuccess(res) {
+        $scope.dbs = ["Create DB " + $scope.project].concat(res.data);
+    }
+
+    $scope.saveDB = function () {
+        var data = {};
+        data.Name = $scope.dbContext;
+        data.Server = $scope.server;
+        data.Port = $scope.port;
+        data.Username = $scope.username;
+        data.Password = $scope.password;
+        data.Project = $scope.project;
+        alert($scope.db.selected);
+        var db = String($scope.db.selected);
+        data.Database = db.replace('Create DB ', '');
+        $http.post(host + '/Data/SaveConnection', data, config).then(saveDBSuccess, errorCallback);
+    }
+
+    function saveDBSuccess(res) {
+        alert(res.data);
+        $uibModalInstance.dismiss();
+    }
+
+    //PreBuild & Build
+    $scope.preBuild = function () {
+        var data = new String($scope.project);
+        $http.post(host + '/Project/PreBuild', data, config).then(preBuildSuccess, errorCallback);
+    }
+
+    function preBuildSuccess(res) {
+        alert(res.data);
+    }
+
+    $scope.build = function () {
+        var data = new String($scope.project);
+        $http.post(host + '/Project/Build', data, config).then(buildSuccess, errorCallback);
+    }
+
+    function buildSuccess(res) {
+        alert(res.data);
+    }
+
+    $scope.deploy = function () {
+        prompt("Enter the port number", "4444").then(
+                    function (response) {
+                        $scope.port = response;
+                        var data = new String($scope.project + ":" + $scope.port);
+                        $http.post(host_iis + '/Server', data, config).then(deploySuccess, errorCallback);
+                    }
+                );
+    }
+
+    function deploySuccess(res) {
+        alert(res.data);
+    }
+
 });
 
 //*************************************EntityCtrl******************************
-app.controller('EntityCtrl', function ($scope, $http, $uibModalInstance, $uibModal, FileSaver, $log) {
-
-    var uri =  host + '/Entity/';
-    
-    $scope.project = undefined;
-
-    $scope.createEntity = function () {
-        var data = {};
-        data.Name = $scope.entityName;
-        data.Json = JSON.stringify($scope.json);
-        data.Project = $scope.project
-        $http.post(uri, data, config).then(entityCreated, errorCallback);
-    }
-
-    function entityCreated(data) {
-        alert(data.data);
-        $uibModalInstance.dismiss();
-    }
-
-    $scope.cancel = function () {
-        $uibModalInstance.dismiss();
-    };
-
+app.controller('EntityCtrl', function ($scope, $http, $uibModal, $uibModalInstance, FileSaver, param) {
 
     $scope.options = {
         "mode": "code",
         "modes": ['tree', 'form', 'code', 'text'],
         "history": false
     };
+
+    $scope.enableDB = true;
+
+    var uri = host + '/Entity';
+
     
-    $scope.showDialog = function () {
+    $scope.showProjects = function () {
         var modalInstance = $uibModal.open({
-            templateUrl: "choose-project.html",            
+            templateUrl: "choose-project.html",
             size: "sm",
             controller: "ProjectCtrl",
             resolve: {
@@ -229,25 +332,59 @@ app.controller('EntityCtrl', function ($scope, $http, $uibModalInstance, $uibMod
             }
         });
 
-        modalInstance.result.then(function (selectedItem) {
-            $scope.project = selectedItem;
+        //On -> Entity Project Selected
+        modalInstance.result.then(function (project) {
+            $scope.project = project;
         });
     };
-    
+
     $scope.projects = [];
 
     $scope.getProjects = function () {
-        var uri = host + '/Project/';
-        $http.get(uri, config).then(getProjectsSuccess, errorCallback);
+        $http.get(host + '/Project', config).then(getProjectsSuccess, errorCallback);
     }
 
-    function getProjectsSuccess(data) {
-        $scope.projects = data.data;
+    function getProjectsSuccess(res) {
+        $scope.projects = res.data;
     }
 
 
+    $scope.createEntity = function () {
+        var data = {};
+        data.Name = $scope.entityName || 'Global';
+
+        if ($scope.enableDB) {
+            //$scope.json.id = 0;
+            data.enableDB = true;
+        }
+        data.Json = JSON.stringify($scope.json);
+        data.Project = $scope.project
+        $http.post(uri, data, config).then(entityCreated, errorCallback);
+    }
+
+    function entityCreated(res) {
+        alert(res.data);
+        $uibModalInstance.dismiss();
+    }
+    
+    //Browse json
+    angular.extend($scope, {
+        readMethod: "readAsText",
+        onReaded: function (e, file) {
+            $scope.json = JSON.parse(e.target.result);
+        }
+    });
+
+    //Download json
+    $scope.download = function () {
+        var blob = new Blob([JSON.stringify($scope.json)], { type: 'application/json;charset=utf-8' });
+        FileSaver.saveAs(blob, ($scope.entityName || 'document') + '.json');
+    }
+
+    //****Service -> Project -> Entity****
     $scope.getEntities = function (project) {
         if (project == undefined) project = 'Global';
+        $scope.project = project;
         $http.get(uri + "?project=" + project , config).then(getEntitiesSuccess, errorCallback);
     }
 
@@ -258,58 +395,141 @@ app.controller('EntityCtrl', function ($scope, $http, $uibModalInstance, $uibMod
         });
     }
 
-    $scope.entity = {};
-    $scope.entity.selected = undefined;
+    //****Entity->Project**** 
+    $scope.choseEntity = {};
 
-    $scope.entitySelected = function () {
-        $uibModalInstance.close($scope.entity.selected);
+    $scope.entitySelected = function (entity) {
+        param.entity = entity;
+        param.project = $scope.project;
+        $uibModalInstance.close(param);
     }
 
-    angular.extend($scope, {
-
-        readMethod: "readAsText",
-
-        onReaded: function (e, file) {
-            $scope.json = JSON.parse(e.target.result);
-        }
-    });
-
-    $scope.download = function () {
-        var blob = new Blob([JSON.stringify($scope.json)], { type: 'application/json;charset=utf-8' });
-        FileSaver.saveAs(blob, ($scope.entityName == undefined ? 'document' : $scope.entityName) + '.json');
-    }
 });
 
 //*************************************ServiceCtrl******************************
-app.controller('ServiceCtrl', function ($scope, $uibModal, $filter, $http, $log) {
+app.controller('ServiceCtrl', function ($scope, $http, $uibModal, $uibModalInstance, $filter, $log) {
 
-    $scope.service = {};
-    $scope.service.project = undefined;
-    $scope.service.methods = [{ name: 'Get', enabled: false }, { name: 'Post', enabled: false }, { name: 'Put', enabled: false }, { name: 'Delete', enabled: false }];
+    $scope.service = {
+        "name": "",
+        "project": "",
+        "methods": [
+          {
+              "name": "Get",
+              "enabled": false,
+              "index":0,
+              "id": "",
+              "type": 0,
+              "request": {
+                  "uriParameters": [],
+                  "headers": [],
+                  "bodyParameters": [],
+                  "sampleJson": ""
+              },
+              "response": {
+                  "headers": [],
+                  "bodyParameters": [],
+                  "type": ""
+              },
+              "path": ""
+          },
+          {
+              "name": "Post",
+              "enabled": false,
+              "index": 1,
+              "id": "",
+              "type": 0,
+              "request": {
+                  "uriParameters": [],
+                  "headers": [],
+                  "bodyParameters": [],
+                  "sampleJson": ""
+              },
+              "response": {
+                  "headers": [],
+                  "bodyParameters": [],
+                  "type": ""
+              },
+              "path": ""
+          },
+          {
+              "name": "Put",
+              "enabled": false,
+              "index": 2,
+              "id": "",
+              "type": 0,
+              "request": {
+                  "uriParameters": [],
+                  "headers": [],
+                  "bodyParameters": [],
+                  "sampleJson": ""
+              },
+              "response": {
+                  "headers": [],
+                  "bodyParameters": [],
+                  "type": ""
+              },
+              "path": ""
+          },
+          {
+              "name": "Delete",
+              "enabled": false,
+              "index": 3,
+              "id": "",
+              "type": 0,
+              "request": {
+                  "uriParameters": [],
+                  "headers": [],
+                  "bodyParameters": [],
+                  "sampleJson": ""
+              },
+              "response": {
+                  "headers": [],
+                  "bodyParameters": [],
+                  "type": ""
+              },
+              "path": ""
+          }
 
-    $scope.entity = undefined;
-    
-    var uri = host + '/Service/';
+        ]
+    };
+
+    var uri = host + '/Service';
 
     $scope.generateCode = function () {
-        $scope.service.project = $scope.project == undefined ? 'Global' : $scope.project;
+
+        $scope.service.project = $scope.project || 'Global';
+        
+        for (var i = 0 ; i < $scope.service.methods.length; i++) {
+            var method = $scope.service.methods[i];
+            if ((method.name == "Post" || method.name == "Put") && method.enabled) {
+                $scope.service.methods[i].request.bodyParameters.push({ name: $scope.service.methods[i].bodyParam, type: $scope.service.methods[i].bodyType })
+            }
+        };
+
         var data = $scope.service;
         var methods = $filter('filter')($scope.service.methods, { enabled: true });
         data.methods = methods;
-        console.log(JSON.stringify(data));
-        $http.post(uri, data, config).then(codeGenerated, errorCallback);
+
+        $http.post(uri, data, config).then(generateCodeSuccess, errorCallback);
     }
 
-    function codeGenerated(data) {
-        alert(data.data);
-        $scope.code = data.data;
+    function generateCodeSuccess(res) {
+        if (res.data.indexOf('Error') == -1){
+            $scope.code = res.data;
+            alert('Code generated, View->Edit->Save');
+        }
+        else {
+            alert(res.data);
+            $scope.code = '';
+        }
     }
 
     $scope.cancel = function () {
         $uibModal.dismiss();
     };
+        
 
-    $scope.showDialog = function () {
+    $scope.showProjects = function () {
         var modalInstance = $uibModal.open({
             templateUrl: "choose-project.html",
             size: "sm",
@@ -318,34 +538,43 @@ app.controller('ServiceCtrl', function ($scope, $uibModal, $filter, $http, $log)
                 param: undefined
             }
         });
-        modalInstance.result.then(function (selectedItem) {
-            $scope.project = selectedItem;
+
+        //On -> service project selected
+        modalInstance.result.then(function(project) {
+            $scope.project = project;
         });
     };
 
-    $scope.showEntity = function () {
+    $scope.showEntities = function (index, response) {
         var modalInstance = $uibModal.open({
             templateUrl: "choose-entity.html",
             size: "sm",
-            controller: "EntityCtrl"
+            controller: "EntityCtrl",
+            resolve: {
+                param: {'index':index, 'response':response}
+            }
         });
 
-        modalInstance.result.then(function (selectedItem) {
-            $scope.entity = selectedItem;
-            
+        //On -> service entity selected
+        modalInstance.result.then(function (data) {            
+            if(data.response=='uri')
+                $scope.service.methods[data.index].uriType = data.entity;
+            else if(data.response=='body')
+                $scope.service.methods[data.index].bodyType = data.entity;
+            else if (data.response == 'response')
+                $scope.service.methods[data.index].response.type = data.entity;
         });
     };
 
+
     $scope.addReqParam = function (index) {
-        if ($scope.service.methods[index].request == undefined) $scope.service.methods[index].request = {};
-        if ($scope.service.methods[index].request.uriParameters == undefined) $scope.service.methods[index].request.uriParameters = [];
-        $scope.service.methods[index].request.uriParameters.push({ name: $scope.service.methods[index].param, type: $scope.service.methods[index].type });
-        $scope.service.methods[index].param = undefined;
-        $scope.service.methods[index].type = undefined;
+        $scope.service.methods[index].request.uriParameters.push({ name: $scope.service.methods[index].uriParam, type: $scope.service.methods[index].uriType })
+        $scope.service.methods[index].uriParam = undefined;
+        $scope.service.methods[index].uriType = 'string';
     }
 
     $scope.removeReqParam = function (index, modelIndex) {
-        $scope.methods[modelIndex].reqParams.splice(index, 1);
+        $scope.service.methods[modelIndex].request.uriParameters.splice(index, 1);
     }
     
     $scope.showCode = function () {
@@ -367,41 +596,51 @@ app.controller('ServiceCtrl', function ($scope, $uibModal, $filter, $http, $log)
     };
 
     $scope.createService = function () {
-        $scope.service.project = $scope.project == undefined ? 'Global' : $scope.project;
+        $scope.service.project = $scope.project || 'Global';
         $scope.service.content = $scope.code;
         var data = $scope.service;
         data.methods = {};
-        console.log(JSON.stringify(data));
-        $http.post(uri + 'Create/', data, config).then(serviceCreated, errorCallback);
+        $http.post(uri + '/Create', data, config).then(createServiceSuccess, errorCallback);
     }
 
-    function serviceCreated(data) {
-         
+    function createServiceSuccess(res) {
+        alert(res.data);
+        $uibModalInstance.dismiss();
+    }
+
+    $scope.selectMethod = function (index) {
+        if ($scope.service.methods[index].enabled) {
+            angular.forEach($scope.service.methods, function (value) {
+                value.active = false;
+            });
+            $scope.service.methods[index].active = true;
+        }
     }
 });
 
 
 //*************************************FileCtrl*********************************
-app.controller('FileCtrl', function ($scope, $http, param, $uibModalInstance, $uibModal) {
-
-    $scope.sites = [];
+app.controller('FileCtrl', function ($scope, $http, $uibModal, $uibModalInstance, param) {
 
     //param flow is from Service -> Code Viewer
     if (param != undefined) {
 
         if (param.code != undefined) $scope.fileViewer = param.code;
+        if (param.title != undefined) $scope.title = param.title;
         if (param.service != undefined) $scope.service = param.service;
         if (param.name != undefined) $scope.name = param.name;
+
+        if (param.name == 'utility') {
+            getUtilityTemplate();
+        }
     }
     else {
-        $scope.service = host + '/file/';
+        $scope.title = 'File explorer';
+        $scope.service = host + '/file';
         $scope.fileViewer = 'Please select a file to view its contents';
     }
 
-    $scope.save = function () {
-        $uibModalInstance.close($scope.fileViewer);
-    }
-
+    //Tree View
     $scope.tree_core = {
 
         multiple: false,  // disable multiple node selection
@@ -416,8 +655,6 @@ app.controller('FileCtrl', function ($scope, $http, param, $uibModalInstance, $u
             return true;  // allow all other operations
         }
     };
-
-    $scope.mode = "csharp";
 
     $scope.nodeSelected = function (e, data) {
         var _l = data.node.li_attr;
@@ -442,6 +679,10 @@ app.controller('FileCtrl', function ($scope, $http, param, $uibModalInstance, $u
         }
     };
     
+
+    //Ace
+    $scope.mode = "csharp";
+
     $scope.aceOption = {
         mode: $scope.mode.toLowerCase(),
         onLoad: function (_ace) {
@@ -452,12 +693,12 @@ app.controller('FileCtrl', function ($scope, $http, param, $uibModalInstance, $u
 
         }
     };
-
+    
     function getMode(file) {
         var fileExt = file.split('.').pop();
         if (fileExt.toLowerCase() == 'js') return 'javascript';
         if (fileExt.toLowerCase() == 'cs') return 'csharp';
-        if (fileExt.toLowerCase() == 'config' || fileExt.toLowerCase() == 'csproj') return 'xml';
+        if (fileExt.toLowerCase() == 'config' || fileExt.toLowerCase() == 'csproj' || fileExt.toLowerCase() == 'pubxml') return 'xml';
         return fileExt;
     }
 
@@ -471,15 +712,15 @@ app.controller('FileCtrl', function ($scope, $http, param, $uibModalInstance, $u
             }
         });
 
-        modalInstance.result.then(function (selectedItem) {
-            $scope.project = selectedItem;
+        modalInstance.result.then(function (project) {
+            $scope.project = project;
         });
     };
 
     $scope.projects = [];
 
     $scope.getProjects = function () {
-        var uri = host + '/Project/';
+        var uri = host + '/Project';
         $http.get(uri, config).then(getProjectsSuccess, errorCallback);
     }
 
@@ -487,18 +728,29 @@ app.controller('FileCtrl', function ($scope, $http, param, $uibModalInstance, $u
         $scope.projects = res.data;
     }
 
+    function getUtilityTemplate() {
+        $http.get(host + '/Utility').then(getUtilityTemplateSuccess, errorCallback);
+    }
+
+    function getUtilityTemplateSuccess(res) {
+        $scope.fileViewer = res.data;
+    }
+
     $scope.createFile = function () {
         var data = {};
         data.Name = $scope.fileName;
         data.Content = $scope.fileViewer;
-        data.Project = $scope.project
-        alert(JSON.stringify(data));
-        $http.post(host + '/Utility/', data, config).then(fileCreated, errorCallback);
+        data.Project = $scope.project;
+        $http.post(host + '/Utility', data, config).then(createFileSuccess, errorCallback);
     }
 
-    function fileCreated(res) {
+    function createFileSuccess(res) {
         alert(res.data);
         $uibModalInstance.dismiss();
+    }
+
+    $scope.save = function () {
+        $uibModalInstance.close($scope.fileViewer);
     }
 });
 
@@ -511,20 +763,12 @@ var config = {
     }
 };
 
-function errorCallback(response) {
-    alert(response.data.Message);
+function errorCallback(res) {
+    if (res.data.Message != undefined)
+        alert(res.data.Message);
+    else if (res.statusText != undefined)
+        alert(res.statusText);
+    else
+        alert('Error occured');
 }
 
-//https://github.com/angular-ui/ui-ace
-//http://angular-ui.github.io/ui-ace/
-//https://github.com/SparrowJang/ngFileReader
-//http://www.sparrowjang.com/ngFileReader/example/index.html
-//https://github.com/alferov/angular-file-saver
-//http://alferov.github.io/angular-file-saver/
-
-//https://developer.github.com/guides/getting-started/
-//http://examples.notsoclever.cc/angular_github/
-//https://github.com/octokit/octokit.net
-//https://github.com/libgit2/libgit2sharp
-//https://github.com/hrajchert/angular-screenfull
-//http://hrajchert.github.io/angular-screenfull/

@@ -70,23 +70,6 @@
  .l-y:before {content: "Y";}
  .l-z:before {content: "Z";}
 
- /*
-.row-eq-height {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display:         flex;
-}
-
-.row{
-    overflow: hidden; 
-}
-
-[class*="col-"]{
-    margin-bottom: -99999px;
-    padding-bottom: 99999px;
-}*/
-
 .btn-file {
     position: relative;
     overflow: hidden;

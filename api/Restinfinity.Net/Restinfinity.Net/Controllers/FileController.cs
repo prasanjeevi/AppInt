@@ -1,5 +1,4 @@
 ﻿using Restinfinity.Net.Utility;
-using Restinfinity.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,40 +10,51 @@ using System.Web.Http.Cors;
 
 namespace Restinfinity.Net.Controllers
 {
-    [EnableCors(origins: "http://localhost:8000", headers: "*", methods: "*")]
+    [EnableCors(origins: Config.Orgins, headers: "*", methods: "*")]
     public class FileController : ApiController
     {
-        const string DirName =  @"E:\AppInt"; //"e:\\Code\\fileBrowserApp-master\\node_modules";
-
-        // GET: api/File
-        public IEnumerable<Models.File> Get()
-        {
-            return processReq(DirName);
-        }
-
         // GET: api/File/5
-        public IEnumerable<Models.File> Get(string id)
+        public IEnumerable<Models.File> Get(string id, string root = Config.AppDirectory)
         {
-            if (id == "1") return processReq(DirName);
-            return processReq(Path.Combine(DirName, id));
+            if (id == "1") return buidFileTree(root);
+            return buidFileTree(Path.Combine(root,id));
         }
 
-
+        // GET: api/File/Lib/5
+        [HttpGet]
+        [Route("api/File/Lib")]
+        public IEnumerable<Models.File> LibGet(string id)
+        {           
+            return Get(id, Config.LibDirectory);
+        }
+        
+        // GET: api/File/Resource/5
         [HttpGet]
         [Route("api/File/Resource")]
         public HttpResponseMessage Resource(string resource)
         {
-            string content = File.ReadAllText(resource);
-            var resp = new HttpResponseMessage(HttpStatusCode.OK);
-            resp.Content = new StringContent(content, System.Text.Encoding.UTF8, "text/html");
-            return resp;
+            try
+            {
+                string content = File.ReadAllText(resource);
+                var resp = new HttpResponseMessage(HttpStatusCode.OK);
+                resp.Content = new StringContent(content, System.Text.Encoding.UTF8, "text/html");
+                resp.Headers.Location = new Uri(resource);
+                return resp;
+            }
+            catch (Exception ex)
+            {
+                var resp = new HttpResponseMessage(HttpStatusCode.NotFound);
+                if (resource.EndsWith(Config.ProjectFile) || resource.EndsWith(Config.WebConfigFile) || resource.EndsWith(Config.BuildLog)) resp.ReasonPhrase = "Prebuild not completed";
+                if (resource.EndsWith(Config.BuildLog)) resp.ReasonPhrase = "Build not completed";
+                return resp;
+            }
         }
 
-        IEnumerable<Models.File> processReq(string path)
+        IEnumerable<Models.File> buidFileTree(string path)
         {
             List<Models.File> resp = new List<Models.File>();
             string[] dirs = FileManager.GetDirectories(path);
-            foreach(var dir in dirs)
+            foreach (var dir in dirs)
             {
                 resp.Add(new Models.File
                 {
@@ -68,8 +78,8 @@ namespace Restinfinity.Net.Controllers
                 {
                     Id = file,
                     Text = file.Split('\\').Last(),
-                    Icon = "fa fa-file-text-o", //"jstree -custom-file",
-                    State = new Models.State(), //Default false-false-false
+                    Icon = "fa fa-file-text-o",
+                    State = new Models.State(),
                     LiAttr = new Models.LiAttr()
                     {
                         Base = file,
@@ -78,7 +88,7 @@ namespace Restinfinity.Net.Controllers
                     Children = false
                 });
             }
-            return resp; //resp.OrderByDescending(i => i.Text);
+            return resp;
         }
-}
+    }
 }

@@ -1,32 +1,32 @@
 ﻿using Restinfinity.Net.Models;
+using Restinfinity.Net.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
+using System.Text;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using Xamasoft.JsonClassGenerator;
 
 namespace Restinfinity.Net.Controllers
 {
-    [EnableCors(origins: "http://localhost:8000", headers: "*", methods: "*")]
+    [EnableCors(origins: Config.Orgins, headers: "*", methods: "*")]
     public class EntityController : ApiController
     {
-        string projectRepository = @"E:\AppInt\project-repository\";
-
         // GET: api/Entity
         public IEnumerable<Entity> Get(string project)
         {
-            string path = Path.Combine(projectRepository, project, "Models");
+            string path = Path.Combine(Config.ProjectRepository, project, Config.Models);
             List<Entity> entities = new List<Entity>();
             try
             {
                 foreach (var file in Directory.GetFiles(path, "*.cs"))
                 {
                     var entity = new Entity();
-                    entity.Name = file.Replace(path, string.Empty).Replace("\\", string.Empty).Replace(".cs", string.Empty);
+                    entity.Name = file.Replace(path, string.Empty)
+                        .Replace("\\", string.Empty)
+                        .Replace(".cs", string.Empty);
                     entity.Content = System.IO.File.ReadAllText(file);
                     entity.Project = project;
                     entities.Add(entity);
@@ -39,43 +39,117 @@ namespace Restinfinity.Net.Controllers
             return entities;
         }
 
-        // GET: api/Entity/5
-        public Entity Get(string project, string id)
+        // GET: api/Entity/entityName
+        public Entity Get(string project, string entityName)
         {
-            string path = Path.Combine(projectRepository, project, "Models", id + ".cs");
+            string path = Path.Combine(Config.ProjectRepository, project, Config.Models, entityName + ".cs");
             var entity = new Entity();
-            entity.Name = id;
+            entity.Name = entityName;
             entity.Content = System.IO.File.ReadAllText(path);
             entity.Project = project;
             return entity;
         }
 
         // POST: api/Entity
-        public void Post([FromBody]Entity value)
+        public IHttpActionResult Post([FromBody]Entity entity)
         {
-            var classGenerator = new JsonClassGenerator();
-            classGenerator.MainClass = value.Name;
-            classGenerator.Example = value.Json;
+            try
+            {
+                var classGenerator = new JsonClassGenerator();
+                classGenerator.MainClass = entity.Name;
+                classGenerator.Example = entity.Json;
 
-            var project = string.IsNullOrEmpty(value.Project) ? "Global" : value.Project;
+                var project = string.IsNullOrEmpty(entity.Project) ? "Global" : entity.Project;
 
-            classGenerator.Namespace = project + ".Models";
-            classGenerator.TargetFolder = Path.Combine(projectRepository, project, "Models");
-            Directory.CreateDirectory(classGenerator.TargetFolder);
-            classGenerator.UseProperties = true;
-            classGenerator.UsePascalCase = true;
+                classGenerator.Namespace = project + "." + Config.Models;
+                classGenerator.TargetFolder = Path.Combine(Config.ProjectRepository, project, Config.Models);
+                Directory.CreateDirectory(classGenerator.TargetFolder);
+                classGenerator.UseProperties = true;
+                classGenerator.UsePascalCase = true;
+                if (entity.EnableDB)
+                    classGenerator.GenerateIdField = true;
 
-            classGenerator.GenerateClasses();
+                var entities = classGenerator.GenerateClasses();
+
+                if (entity.EnableDB)
+                {
+                    addDBContext(entity.Project, entities);
+                }
+
+                return Ok("Entity created successfully");
+            }
+            catch(Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+        
+        void addDBContext(string project, IEnumerable<string> entities)
+        {            
+            var path = Path.Combine(Config.ProjectRepository, project, Config.DAL);
+            var file = Path.Combine(path, project + "Context.cs");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+                string content = createDBContext(project, entities);
+                System.IO.File.WriteAllText(file,content);
+            }
+            else
+            {
+                var lines = System.IO.File.ReadAllLines(file).ToList();
+                int dbSetEnd = lines.FindLastIndex(l => l.StartsWith("public DbSet<"));
+                lines.Insert(dbSetEnd, addDBSet(entities));
+                System.IO.File.WriteAllLines(file, lines);
+            }
         }
 
-        // PUT: api/Entity/5
-        public void Put(int id, [FromBody]string value)
+        string createDBContext(string project, IEnumerable<string> models)
         {
+            project = project.Capitalize();
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine("using {0}." + Config.Models + ";");
+            sb.AppendLine("using System.Data.Entity;");
+            sb.AppendLine("using System.Data.Entity.ModelConfiguration.Conventions;");
+            sb.AppendLine();
+            sb.AppendLine("namespace {0}." + Config.DAL);
+            sb.AppendLine("{");
+            sb.AppendLine("public class {0}Context : DbContext");
+            sb.AppendLine("{");
+            sb.AppendLine("public {0}Context() : base(\"{0}Context\")");
+            sb.AppendLine("{");
+            sb.AppendLine();
+            sb.AppendLine("}");
+            
+            sb.AppendLine(addDBSet(models));
+
+            sb.AppendLine("protected override void OnModelCreating(DbModelBuilder modelBuilder)");
+            sb.AppendLine("{");
+            sb.AppendLine("modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();");
+            sb.AppendLine("}");
+
+            sb.AppendLine("}"); //Class end
+            sb.AppendLine("}"); //Namespace end
+
+            sb.Replace("{0}", project);
+
+            return sb.ToString();
+
         }
 
-        // DELETE: api/Entity/5
-        public void Delete(int id)
+        string addDBSet(IEnumerable<string> models)
         {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var model in models)
+            {
+                sb.AppendLine(string.Format("public DbSet<{0}> {1}",
+                    model.Capitalize(), model.Pluralize().Capitalize()) + "{ get; set; }");
+            }
+
+            return sb.ToString();
         }
+        
     }
 }
