@@ -50,6 +50,20 @@ namespace Restinfinity.Net.Controllers
             }
         }
 
+        // POST: api/File/Save
+        public IHttpActionResult Save(string file, [FromBody]string content)
+        {
+            try
+            {
+                System.IO.File.WriteAllText(file.Split('=')[1], content);
+                return Ok("Saved successfully");
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
         IEnumerable<Models.File> buidFileTree(string path)
         {
             List<Models.File> resp = new List<Models.File>();

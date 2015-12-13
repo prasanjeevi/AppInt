@@ -1,3 +1,5 @@
+var host_iis = 'http://localhost:9229/appint/api';  //For IIS
+var host = 'http://localhost:61081/api';      //For debuging
 
 var app = angular.module('appint',
     ['ui.bootstrap', 'angular-json-editor', 'ngSanitize', 'ui.select', 'jsTree.directive',
@@ -23,9 +25,6 @@ app.factory("prompt", function ($window, $q) {
 
 	return (prompt);
 });
-
-var host_iis = 'http://localhost:9229/appint/api';  //For IIS
-var host = 'http://localhost:61081/api';      //For debuging
 
 //*************************************AppIntCtrl******************************
 app.controller('AppIntCtrl', function ($scope, $http, $uibModal) {
@@ -85,8 +84,8 @@ app.controller('AppIntCtrl', function ($scope, $http, $uibModal) {
         {
             name: 'Rest client',
             icon: 'fa fa-globe',
-            src: 'file-explorer.html',
-            ctrl: 'FileCtrl',
+            src: 'rest-client.html',
+            ctrl: 'RestCtrl',
             size: 'lg'
         },
         {
@@ -95,7 +94,7 @@ app.controller('AppIntCtrl', function ($scope, $http, $uibModal) {
             src: 'file-explorer.html',
             ctrl: 'FileCtrl',
             size: 'lg',
-            param: { name: 'iis', service: host + '/server', title: 'IIS explorer' }
+            param: { name: 'iis', service: host_iis + '/server', title: 'IIS explorer' }
         }
     ];
 
@@ -151,16 +150,18 @@ app.controller('AppIntCtrl', function ($scope, $http, $uibModal) {
 app.controller('ProjectCtrl', function ($scope, $http, $uibModal, $uibModalInstance, prompt, param) {
     
     var uri = host + '/Project';
-
+    $scope.loader = false;
     //param from Project Explorer Flow
     if (param != undefined) $scope.project = param.project;
         
     $scope.createProject = function () {
         var data = new String($scope.project);
+        $scope.loader = true;
         $http.post(uri, data, config).then(createProjectSuccess, errorCallback);
     }
 
     function createProjectSuccess(res) {
+        $scope.loader = false;
         alert(res.data);
         $uibModalInstance.close($scope.project); //To -> AppIntCtrl
     }
@@ -211,11 +212,7 @@ app.controller('ProjectCtrl', function ($scope, $http, $uibModal, $uibModalInsta
             controller: "FileCtrl",
             resolve: {
                 param: function () {
-                    if (res.config.url.indexOf('project-repository') != -1)
-                        return { code: res.data, title: 'Code Viewer' + res.config.url.split('project-repository')[1].replace(/\\/g, '>') };
-                    else if (res.config.url.indexOf('builds') != -1)
-                        return { code: res.data, title: 'Code Viewer' + res.config.url.split('builds')[1].replace(/\\/g, '>') };
-                    else return { code: res.data, title: 'Code Viewer' + res.config.url };
+                    return { 'code': res.data, 'uri': res.config.url };
                 }
             }
         });
@@ -226,11 +223,27 @@ app.controller('ProjectCtrl', function ($scope, $http, $uibModal, $uibModalInsta
         });
     };
 
+    $scope.showTool = function (src, ctrl, size, project) {
+
+        var modalInstance = $uibModal.open({
+            templateUrl: src,
+            controller: ctrl,
+            size: size,
+            resolve: {
+                param: function () {
+                    if (ctrl == 'FileCtrl')
+                        return { 'name': 'utility', 'title': 'Utility Code Editor', 'project': project };
+                    else
+                        return { 'project': project};
+                }
+            }
+        });
+    }
 
     //Data Manager
     $scope.serverType = 'mssql';
     $scope.port = 1433;
-    $scope.dbContext = 'GlobalContext'
+    $scope.dbContext = $scope.project == undefined ? 'GlobalContext' : $scope.project + 'Context';
 
     $scope.setDBContext = function (project) {
         $scope.project = project;
@@ -238,6 +251,7 @@ app.controller('ProjectCtrl', function ($scope, $http, $uibModal, $uibModalInsta
         $scope.dbs = ["Create DB " + project];
     }
     $scope.db = {};
+    
     $scope.getDBs = function () {
         var data = {};
         data.Name = $scope.dbContext;
@@ -246,11 +260,14 @@ app.controller('ProjectCtrl', function ($scope, $http, $uibModal, $uibModalInsta
         data.Username = $scope.username;
         data.Password = $scope.password;
         data.Project = $scope.project;
-        data.Database = String($scope.db.selected).indexOf('Create DB ') == -1 ? $scope.db.selected : 'master';
+        data.Database = (new String($scope.db.selected)).indexOf('Create DB ') == -1 ? $scope.db.selected : 'master';
+
+        $scope.loaderSub = true;
         $http.post(host + '/Data/TestConnection', data, config).then(getDBsSuccess, errorCallback);
     }
 
     function getDBsSuccess(res) {
+        $scope.loaderSub = true;
         $scope.dbs = ["Create DB " + $scope.project].concat(res.data);
     }
 
@@ -262,48 +279,51 @@ app.controller('ProjectCtrl', function ($scope, $http, $uibModal, $uibModalInsta
         data.Username = $scope.username;
         data.Password = $scope.password;
         data.Project = $scope.project;
-        alert($scope.db.selected);
-        var db = String($scope.db.selected);
+        
+        var db = new String($scope.db.selected);
         data.Database = db.replace('Create DB ', '');
+
+        $scope.loader = true;
         $http.post(host + '/Data/SaveConnection', data, config).then(saveDBSuccess, errorCallback);
     }
 
     function saveDBSuccess(res) {
+        $scope.loader = false;
         alert(res.data);
         $uibModalInstance.dismiss();
     }
 
     //PreBuild & Build
     $scope.preBuild = function () {
+        $scope.message = 'Processing pre build';
+        $scope.loader = true;
         var data = new String($scope.project);
-        $http.post(host + '/Project/PreBuild', data, config).then(preBuildSuccess, errorCallback);
+        $http.post(host + '/Project/PreBuild', data, config).then(successCallback, errorCallback);
     }
-
-    function preBuildSuccess(res) {
-        alert(res.data);
-    }
-
+    
     $scope.build = function () {
+        $scope.message = 'Processing build';
+        $scope.loader = true;
         var data = new String($scope.project);
-        $http.post(host + '/Project/Build', data, config).then(buildSuccess, errorCallback);
+        $http.post(host + '/Project/Build', data, config).then(successCallback, errorCallback);
     }
-
-    function buildSuccess(res) {
-        alert(res.data);
-    }
-
+       
     $scope.deploy = function () {
+        $scope.message = 'Processing deploy';
         prompt("Enter the port number", "4444").then(
-                    function (response) {
-                        $scope.port = response;
-                        var data = new String($scope.project + ":" + $scope.port);
-                        $http.post(host_iis + '/Server', data, config).then(deploySuccess, errorCallback);
-                    }
-                );
+            function (response) {
+                $scope.loader = true;
+                $scope.port = response;
+                var data = new String($scope.project + ":" + $scope.port);
+                $http.post(host_iis + '/Server', data, config).then(successCallback, errorCallback);
+            }
+        );
     }
 
-    function deploySuccess(res) {
-        alert(res.data);
+    function successCallback(res) {
+        //$scope.loader = false;
+        //alert(res.data);
+        $scope.message = res.data;
     }
 
 });
@@ -311,6 +331,11 @@ app.controller('ProjectCtrl', function ($scope, $http, $uibModal, $uibModalInsta
 //*************************************EntityCtrl******************************
 app.controller('EntityCtrl', function ($scope, $http, $uibModal, $uibModalInstance, FileSaver, param) {
 
+    if (param != undefined){
+        if (param.project != undefined) $scope.project = param.project;
+    }
+
+    $scope.loader = false;
     $scope.options = {
         "mode": "code",
         "modes": ['tree', 'form', 'code', 'text'],
@@ -319,9 +344,9 @@ app.controller('EntityCtrl', function ($scope, $http, $uibModal, $uibModalInstan
 
     $scope.enableDB = true;
 
+
     var uri = host + '/Entity';
 
-    
     $scope.showProjects = function () {
         var modalInstance = $uibModal.open({
             templateUrl: "choose-project.html",
@@ -358,11 +383,14 @@ app.controller('EntityCtrl', function ($scope, $http, $uibModal, $uibModalInstan
             data.enableDB = true;
         }
         data.Json = JSON.stringify($scope.json);
-        data.Project = $scope.project
+        data.Project = $scope.project;
+
+        $scope.loader = true;
         $http.post(uri, data, config).then(entityCreated, errorCallback);
     }
 
     function entityCreated(res) {
+        $scope.loader = false;
         alert(res.data);
         $uibModalInstance.dismiss();
     }
@@ -407,8 +435,13 @@ app.controller('EntityCtrl', function ($scope, $http, $uibModal, $uibModalInstan
 });
 
 //*************************************ServiceCtrl******************************
-app.controller('ServiceCtrl', function ($scope, $http, $uibModal, $uibModalInstance, $filter, $log) {
+app.controller('ServiceCtrl', function ($scope, $http, $uibModal, $uibModalInstance, $filter, $log, param) {
 
+    if (param != undefined) {
+        if (param.project != undefined) $scope.project = param.project;
+    }
+
+    $scope.loader = false;
     $scope.service = {
         "name": "",
         "project": "",
@@ -510,10 +543,12 @@ app.controller('ServiceCtrl', function ($scope, $http, $uibModal, $uibModalInsta
         var methods = $filter('filter')($scope.service.methods, { enabled: true });
         data.methods = methods;
 
+        $scope.loaderSub = true;
         $http.post(uri, data, config).then(generateCodeSuccess, errorCallback);
     }
 
     function generateCodeSuccess(res) {
+        $scope.loaderSub = false;
         if (res.data.indexOf('Error') == -1){
             $scope.code = res.data;
             alert('Code generated, View->Edit->Save');
@@ -600,10 +635,13 @@ app.controller('ServiceCtrl', function ($scope, $http, $uibModal, $uibModalInsta
         $scope.service.content = $scope.code;
         var data = $scope.service;
         data.methods = {};
+
+        $scope.loader = true;
         $http.post(uri + '/Create', data, config).then(createServiceSuccess, errorCallback);
     }
 
     function createServiceSuccess(res) {
+        $scope.loader = false;
         alert(res.data);
         $uibModalInstance.dismiss();
     }
@@ -622,16 +660,22 @@ app.controller('ServiceCtrl', function ($scope, $http, $uibModal, $uibModalInsta
 //*************************************FileCtrl*********************************
 app.controller('FileCtrl', function ($scope, $http, $uibModal, $uibModalInstance, param) {
 
+    $scope.loader = false;
     //param flow is from Service -> Code Viewer
     if (param != undefined) {
 
         if (param.code != undefined) $scope.fileViewer = param.code;
-        if (param.title != undefined) $scope.title = param.title;
+        if (param.uri != undefined) {
+            $scope.uri = param.uri;
+            $scope.title = getTitle(param.uri);
+        }
         if (param.service != undefined) $scope.service = param.service;
         if (param.name != undefined) $scope.name = param.name;
+        if (param.project != undefined) $scope.project = param.project;
 
         if (param.name == 'utility') {
-            getUtilityTemplate();
+            getUtilityTemplate($scope.project);
+            $scope.title = param.title;
         }
     }
     else {
@@ -681,7 +725,7 @@ app.controller('FileCtrl', function ($scope, $http, $uibModal, $uibModalInstance
     
 
     //Ace
-    $scope.mode = "csharp";
+    $scope.mode = getMode($scope.uri);
 
     $scope.aceOption = {
         mode: $scope.mode.toLowerCase(),
@@ -695,6 +739,8 @@ app.controller('FileCtrl', function ($scope, $http, $uibModal, $uibModalInstance
     };
     
     function getMode(file) {
+        if (file == undefined) return 'csharp';
+
         var fileExt = file.split('.').pop();
         if (fileExt.toLowerCase() == 'js') return 'javascript';
         if (fileExt.toLowerCase() == 'cs') return 'csharp';
@@ -728,8 +774,11 @@ app.controller('FileCtrl', function ($scope, $http, $uibModal, $uibModalInstance
         $scope.projects = res.data;
     }
 
-    function getUtilityTemplate() {
-        $http.get(host + '/Utility').then(getUtilityTemplateSuccess, errorCallback);
+    function getUtilityTemplate(project) {
+        var uri = host + '/Utility';
+        if (project != undefined) uri = uri + '?project=' + project;
+
+        $http.get(uri).then(getUtilityTemplateSuccess, errorCallback);
     }
 
     function getUtilityTemplateSuccess(res) {
@@ -741,19 +790,97 @@ app.controller('FileCtrl', function ($scope, $http, $uibModal, $uibModalInstance
         data.Name = $scope.fileName;
         data.Content = $scope.fileViewer;
         data.Project = $scope.project;
+
+        $scope.loader = true;
         $http.post(host + '/Utility', data, config).then(createFileSuccess, errorCallback);
     }
 
     function createFileSuccess(res) {
+        $scope.loader = false;
         alert(res.data);
         $uibModalInstance.dismiss();
     }
 
-    $scope.save = function () {
+    $scope.save = function (uri) {
+        if (uri != undefined) {
+            var data = new String($scope.fileViewer);
+            $http.post(host + '/File/Save?file=' + uri, data, config).then(createFileSuccess, errorCallback);
+        }
+        else
         $uibModalInstance.close($scope.fileViewer);
     }
 });
 
+//*************************************RestCtrl******************************
+app.controller('RestCtrl', function ($scope, $http, $uibModal, $uibModalInstance) {
+    $scope.method = 'GET';
+    $scope.options = {
+        "mode": 'code',
+        "modes": ['tree', 'form', 'code', 'text'],
+        "history": false
+    };
+    $scope.result = false;
+    $scope.aceOption = {
+        mode: 'json',
+        onLoad: function (_ace) {
+            //The ace instance in the scope...
+            $scope.modeChanged = function () {
+                _ace.getSession().setMode("ace/mode/" + 'json');
+            };
+
+        }
+    };
+    $scope.headers = config.headers;
+    $scope.uri = host;
+    
+    $scope.req = { data : "{}" };
+    $scope.res = "Response";
+    $scope.obj = { 
+        headerKey : '',
+        headerVal : ''
+    }
+    $scope.addHeader = function () {
+        $scope.headers[$scope.obj.headerKey] = $scope.obj.headerVal;
+        $scope.obj.headerKey = '';
+        $scope.obj.headerVal = '';
+    }
+    $scope.removeHeader = function (key) {
+        delete $scope.headers[key];
+    }
+    $scope.send = function () {
+        var method = $scope.method;
+        var uri = $scope.uri;
+
+        var config = { headers: $scope.headers };
+        var data = $scope.enableString ? (new String($scope.dataString)) : JSON.stringify($scope.req.data);
+        $scope.loader = true;
+        switch (method) {
+            case 'GET':
+                $http.get(uri,config).then(restSuccess,restError);
+                break;
+            case 'POST':                
+                $http.post(uri,data,config).then(restSuccess,restError);
+                break;
+            case 'PUT':
+                $http.put(uri,data,config).then(restSuccess,restError);
+                break;
+            case 'DELETE':
+                $http.delete(uri,data,config).then(restSuccess,restError);
+                break;
+        }
+    }
+    function restSuccess(res) {
+        alert('Received response');
+        $scope.loader = false;
+        $scope.res = JSON.stringify(res, null, 2);
+        $scope.result = true;
+
+    }
+    function restError(res) {
+        $scope.res = JSON.stringify(res, null, 2);
+        $scope.result = true;
+    }
+});
 
 //*************************************Common***********************************
 var config = {
@@ -772,3 +899,10 @@ function errorCallback(res) {
         alert('Error occured');
 }
 
+function getTitle(url) {
+    if (url.indexOf('project-repository') != -1)
+        return 'Code Viewer' + url.split('project-repository')[1].replace(/\\/g, '>');
+    else if (url.indexOf('builds') != -1)
+        return 'Code Viewer' + url.split('builds')[1].replace(/\\/g, '>');
+    else return 'Code Viewer' + url;
+}

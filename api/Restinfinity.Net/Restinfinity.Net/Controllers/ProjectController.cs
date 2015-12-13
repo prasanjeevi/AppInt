@@ -57,7 +57,7 @@ namespace Restinfinity.Net.Controllers
 
         // POST: api/Project
         public IHttpActionResult Post([FromBody]string project)
-        {
+        {            
             if (string.IsNullOrEmpty(project))
             {
                 return BadRequest("Project name is missing");

@@ -70,7 +70,11 @@ namespace Restinfinity.Net.Controllers
         string getSampleJson(IDictionary<MediaTypeHeaderValue, object> dict)
         {
             if (dict.Count == 0) return string.Empty;
-            return dict[MediaTypeHeaderValue.Parse("application/json")].ToString();
+
+            if (dict[MediaTypeHeaderValue.Parse("application/json")] != null)
+                return dict[MediaTypeHeaderValue.Parse("application/json")].ToString();
+            else
+                return string.Empty;
         }
     }
 }

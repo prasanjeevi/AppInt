@@ -22,3 +22,15 @@ E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\System.Web.Htt
 E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\obj\Debug\Restinfinity.Net.Utility.csprojResolveAssemblyReference.cache
 E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\obj\Debug\Restinfinity.Net.Utility.dll
 E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\obj\Debug\Restinfinity.Net.Utility.pdb
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\MongoDB.Bson.dll
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\MongoDB.Driver.Core.dll
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\MongoDB.Driver.dll
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\MongoDB.Bson.pdb
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\MongoDB.Bson.xml
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\MongoDB.Driver.pdb
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\MongoDB.Driver.xml
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\MongoDB.Driver.Core.pdb
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\MongoDB.Driver.Core.xml
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\Restinfinity.Net.Utility.dll.config
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\Microsoft.Practices.EnterpriseLibrary.Logging.dll
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net.Utility\bin\Debug\Microsoft.Practices.EnterpriseLibrary.Logging.xml

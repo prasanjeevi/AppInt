@@ -19,15 +19,17 @@ namespace Restinfinity.Net.Controllers
                 StringBuilder template = new StringBuilder();
 
                 template.AppendLine("using System.Collections.Generic;");
-                template.AppendLine("using System.Web.Http;");
                 template.AppendLine("using System.Linq;");
                 template.AppendLine("using System.Web;");
+                template.AppendLine("using System.Web.Http;");
+                template.AppendLine("using System.Web.Http.Cors;");                
                 template.AppendLine();
                 template.AppendLine("using " + service.Project + ".Models;");
                 template.AppendLine("using " + service.Project + ".Utility;");
                 template.AppendLine("using " + service.Project + ".DAL;");
                 template.AppendLine("namespace " + service.Project + ".Controllers");
                 template.AppendLine("{");//namespace start
+                template.AppendLine("[EnableCors(origins: \"*\", headers: \"*\", methods: \"*\")]");
                 template.AppendLine("public class " + service.Name + "Controller : ApiController");
                 template.AppendLine("{");//class start
 

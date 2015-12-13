@@ -71,3 +71,14 @@ E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\bin\Microsoft.Practices.Enterpri
 E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\obj\Debug\Restinfinity.Net.csprojResolveAssemblyReference.cache
 E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\obj\Debug\Restinfinity.Net.dll
 E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\obj\Debug\Restinfinity.Net.pdb
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\bin\MongoDB.Driver.dll
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\bin\MongoDB.Bson.dll
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\bin\MongoDB.Driver.Core.dll
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\bin\MongoDB.Driver.pdb
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\bin\MongoDB.Driver.xml
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\bin\MongoDB.Bson.pdb
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\bin\MongoDB.Bson.xml
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\bin\MongoDB.Driver.Core.pdb
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\bin\MongoDB.Driver.Core.xml
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\bin\Microsoft.Practices.EnterpriseLibrary.Logging.dll
+E:\AppInt\api\Restinfinity.Net\Restinfinity.Net\bin\Microsoft.Practices.EnterpriseLibrary.Logging.xml

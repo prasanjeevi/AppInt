@@ -15,7 +15,7 @@
     <link href="favicon.ico" rel="icon" type="image/x-icon">
 </head>
 <body ng-controller="AppIntCtrl">
-    
+
     <!--Nav-->
     <nav class="navbar navbar-fixed-top navbar-default ">
         <div class="container">
@@ -30,8 +30,8 @@
             </div>
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#about">Docs</a></li>
+                    <li class="active"><a href="/UI/index.html">Home</a></li>
+                    <li><a href="/api/Restinfinity.Net/Restinfinity.Net/Docs.html">Docs</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div>
@@ -80,7 +80,7 @@
                     <div class="panel-heading">Projects</div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-md-12" role="main">                               
+                            <div class="col-md-12" role="main">
                                 <div class="bs-docs-section">
                                     <div class="bs-glyphicons">
                                         <ul id="tools-list" class="bs-glyphicons-list">
@@ -90,7 +90,7 @@
                                             </li>
                                         </ul>
                                     </div>
-                                </div>                                        
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -104,12 +104,12 @@
     <script src="../lib/ace-builds/src-min/ace.js"></script>
     <script src="../lib/js/angular.js"></script>
     <script src="../lib/angular-ui-ace/ui-ace.js"></script>
-    <script src="../lib/js/jquery-1.11.3.min.js"></script>    
+    <script src="../lib/js/jquery-1.11.3.min.js"></script>
     <script src="../lib/js/angular-json-editor.js"></script>
     <script src="../lib/bootstrap/js/bootstrap.js"></script>
     <script src="../lib/js/ui-bootstrap-tpls-0.14.3.js"></script>
     <script src="../lib/js/angular-sanitize.min.js"></script>
-    <script src="../lib/ui-select/select.min.js"></script>   
+    <script src="../lib/ui-select/select.min.js"></script>
     <script src="../lib/jstree/jstree.min.js"></script>
     <script src="../lib/jstree-directive/jsTree.directive.js"></script>
     <script src="../lib/js/jquery.FileReader.js"></script>
@@ -118,9 +118,9 @@
     <script src="../lib/js/angular-file-saver.js"></script>
     <script src="../lib/js/screenfull.js"></script>
     <script src="../lib/js/angular-screenfull.min.js"></script>
-    
-    <script src="js/app.js"></script>
-    
+
+    <script src=" js/app.js"></script>
+
     <!--Templates-->
     <script type="text/ng-template" id="create-project.html">
         <div class="panel panel-default">
@@ -131,7 +131,9 @@
                         <label for="project-name">Name</label>
                         <input type="text" class="form-control" id="project-name" autofocus="autofocus" placeholder="Project name" ng-model="project">
                     </div>
-                    <button type="submit" class="btn btn-primary" ng-click="createProject()">Create</button>
+                    <button type="submit" class="btn btn-primary has-spinner" ng-class="{'active' : loader}" ng-click="createProject()">Create
+                        <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+                    </button>
                     <button type="submit" class="btn btn-default" ng-click="cancel()">Cancel</button>
                 </form>
             </div>
@@ -156,10 +158,10 @@
                         <ul class="uib-dropdown-menu" role="menu" aria-labelledby="split-button">
                             <li role="menuitem" ng-click="showProjects()"><a href="#">Choose project</a></li>
                             <li role="menuitem" ng-click="project='Global'"><a href="#">Create in global</a></li>
-                        </ul>
+                        </ul>                        
                     </div>
-                    <label style="font-weight:normal"><input type="checkbox" ng-model="enableDB" id="enableDB" />Create Table</label>    
-                    <div class="btn-group pull-right">                       
+                    <label style="font-weight:normal"><input type="checkbox" ng-model="enableDB" id="enableDB" />Create Table</label>
+                    <div class="btn-group pull-right">
                         <button class="btn btn-info glyphicon glyphicon-folder-open btn-file" title="Browse json" ng-file-reader read-method="readMethod" on-readed="onReaded(event,file)"></button>
                         <button class="btn btn-info glyphicon glyphicon-download" title="Download json" ng-click="download()"></button>
                     </div>
@@ -167,7 +169,7 @@
             </div>
         </div>
     </script>
-    
+
     <script type="text/ng-template" id="choose-project.html">
         <div class="panel panel-default">
             <div class="panel-heading">Choose Project</div>
@@ -181,7 +183,7 @@
             </div>
         </div>
     </script>
-    
+
     <script type="text/ng-template" id="create-service.html">
         <div class="panel panel-default">
             <div class="panel-heading">Create Service</div>
@@ -193,7 +195,7 @@
                         <label ng-repeat="method in service.methods" class="btn btn-default" ng-model="method.enabled" uib-btn-checkbox ng-click="selectMethod(method.index)">{{method.name | uppercase}}</label>
                     </div>
                     <button class="btn btn-default" ng-click="showProjects()">{{project == undefined ? 'Choose Project' : project}}</button>
-                    
+
                 </div>
                 <uib-tabset>
                     <uib-tab ng-repeat="method in service.methods | filter:{ enabled: true}" heading="{{method.name | uppercase}}" active="method.active">
@@ -202,7 +204,7 @@
                             <div class="form-inline col-sm-6">
                                 <div>URI Params</div>
                                 <input type="text" class="form-control" placeholder="param" ng-model="service.methods[method.index].uriParam">
-                            
+
                                 <div class="btn-group" uib-dropdown>
                                     <button id="split-button" type="button" class="btn btn-default" ng-init="service.methods[method.index].uriType='string'">{{service.methods[method.index].uriType }}</button>
                                     <button type="button" class="btn btn-default" uib-dropdown-toggle>
@@ -217,7 +219,7 @@
                                     </ul>
                                 </div>
                                 <button class="btn btn-default" ng-click="addReqParam(method.index)">+</button>
-                                
+
                                 <table class="table table-bordered" ng-if="service.methods[method.index].request.uriParameters.length > 0">
                                     <tr ng-repeat="rp in service.methods[method.index].request.uriParameters">
                                         <td><small>{{ rp.name }}</small></td>
@@ -265,9 +267,13 @@
                             </div>
                         </div>
                         <div class="btn-margin">
-                            <button class="btn btn-default" ng-click="generateCode()">Generate</button>
+                            <button class="btn btn-default has-spinner" ng-class="{'active' : loaderSub}" ng-click="generateCode()">Generate
+                                <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+                            </button>
                             <button class="btn btn-default" ng-click="showCode()">View</button>
-                            <button class="btn btn-primary" ng-click="createService()">Create</button>
+                            <button class="btn btn-primary has-spinner" ng-class="{'active' : loader}" ng-click="createService()">Create
+                                <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+                            </button>
                         </div>
                     </uib-tab>
                 </uib-tabset>
@@ -296,7 +302,7 @@
             </div>
         </div>
     </script>
-    
+
     <script type="text/ng-template" id="project-explorer.html">
         <div class="row" ng-init="getProjectDetail()">
             <!--proj explorer-->
@@ -310,11 +316,11 @@
                             <label for="package">Package</label>
                             <input type="text" class="form-control" id="package" placeholder="Package name" ng-model="project">
                             <button class="btn btn-default">Save</button>
-                        </div>     
+                        </div>
                         <div class="row">
                             <div class="col-md-6" role="main">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading">Services<button class="btn btn-primary pull-right">Create</button></div>
+                                    <div class="panel-heading">Services<button class="btn btn-primary pull-right" ng-click="showTool('create-service.html','ServiceCtrl','lg',project)">Create</button></div>
                                     <div class="panel-body">
                                         <div>
                                             <button class="btn btn-info btn-xs" style="margin:0 0 2px 2px" ng-repeat="service in services" ng-click="showCode(service.id)">{{service.text}}</button>
@@ -324,7 +330,7 @@
                             </div>
                             <div class="col-md-6" role="main">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading">Entities<button class="btn btn-primary pull-right">Create</button></div>
+                                    <div class="panel-heading">Entities<button class="btn btn-primary pull-right" ng-click="showTool('entity-editor.html','EntityCtrl','md',project)">Create</button></div>
                                     <div class="panel-body">
                                         <div>
                                             <button class="btn btn-info btn-xs" style="margin:0 0 2px 2px" ng-repeat="entity in entities" ng-click="showCode(entity.id)">{{entity.text}}</button>
@@ -336,10 +342,9 @@
                         <div class="row">
                             <div class="col-md-3" role="main">
                                 <div class="panel panel-default">
-                                    <div class="panel-heading">Utilites<button class="btn btn-primary pull-right">Create</button></div>
+                                    <div class="panel-heading">Utilites<button class="btn btn-primary pull-right" ng-click="showTool('code-editor.html','FileCtrl','lg',project)">Create</button></div>
                                     <div class="panel-body">
                                         <button class="btn btn-info btn-xs" style="margin:0 0 2px 2px" ng-repeat="utility in utilities" ng-click="showCode(utility.id)">{{utility.text}}</button>
-                                        <button class="btn btn-default btn-xs">Settings</button>
                                     </div>
                                 </div>
                             </div>
@@ -348,7 +353,7 @@
                                     <div class="panel-heading">Database</div>
                                     <div class="panel-body">
                                         <button class="btn btn-info btn-xs" style="margin:0 0 2px 2px" ng-repeat="dal in dals" ng-click="showCode(dal.id)">{{dal.text}}</button>
-                                        <button class="btn btn-default btn-xs">Connection</button>
+                                        <button class="btn btn-default btn-xs" ng-click="showTool('db-manager.html','ProjectCtrl','md',project)">Connection</button>
                                     </div>
                                 </div>
                             </div>
@@ -367,12 +372,18 @@
                                     <div class="panel-heading">Deploy</div>
                                     <div class="panel-body">
                                         <button class="btn btn-default btn-xs" ng-click="deploy()">Deploy</button>
-                                        <button class="btn btn-default btn-xs">Server</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div id="loader" class="flyover" ng-show="loader">
+                <div class="mask"></div>
+                <div class="alert alert-info">
+                    <strong>{{message}} <i ng-show="message == 'Processing'" class="fa fa-spin fa-refresh"></i></strong>
+                    <button class="btn btn-info btn-xs" ng-click="loader=false">Ok</button>
                 </div>
             </div>
         </div>
@@ -386,14 +397,18 @@
                     <i show-if-fullscreen=false class='glyphicon glyphicon-resize-full'></i>
                     <i show-if-fullscreen=true class='glyphicon glyphicon-resize-small'></i>
                 </button>
-                <button class="btn btn-primary pull-right" ng-click="save()">Save</button>
+                <button class="btn btn-primary pull-right has-spinner" ng-class="{'active' : loader}" ng-click="save(uri)" ng-show="name!='utility'">Save
+                    <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+                </button>
             </p>
             <form class="form-inline" ng-if="name=='utility'">
                 <div class="form-group">
                     <input type="text" class="form-control" id="file-name" placeholder="{{name}} name" ng-model="$parent.fileName">
                 </div>
                 <div class="btn-group" uib-dropdown>
-                    <button id="split-button" type="button" class="btn btn-primary" ng-click="createFile()">Create{{project != undefined ? ' in ' + project : ''}}</button>
+                    <button id="split-button" type="button" class="btn btn-primary has-spinner" ng-class="{'active' : loader}" ng-click="createFile()">Create{{project != undefined ? ' in ' + project : ''}}
+                        <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+                    </button>
                     <button type="button" class="btn btn-primary" uib-dropdown-toggle>
                         <span class="caret"></span>
                         <span class="sr-only">Split button!</span>
@@ -416,7 +431,7 @@
                     <div class="form-group">
                         <label for="project" class="control-label col-sm-2">Project</label>
                         <div class="col-sm-10">
-                            <ui-select ng-model="chooseData.selected" theme="selectize" ng-disabled="disabled" ng-init="getProjects()" on-select="setDBContext($select.selected)">
+                            <ui-select id="db-project" ng-model="chooseData.selected" theme="selectize" ng-disabled="disabled" ng-init="getProjects()" on-select="setDBContext($select.selected)">
                                 <ui-select-match placeholder="Select or search project">{{$select.selected}}</ui-select-match>
                                 <ui-select-choices repeat="project in projects | filter: $select.search">
                                     <span ng-bind-html="project | highlight: $select.search"></span>
@@ -462,7 +477,7 @@
                     <div class="form-group">
                         <label for="project" class="control-label col-sm-2">Database</label>
                         <ui-select class="col-xs-10" ng-model="db.selected" theme="selectize" ng-disabled="disabled">
-                            <ui-select-match placeholder="Select or search project">{{$select.selected}}</ui-select-match>
+                            <ui-select-match placeholder="Select or search database">{{$select.selected}}</ui-select-match>
                             <ui-select-choices repeat="db in dbs | filter: $select.search">
                                 <span ng-bind-html="db | highlight: $select.search"></span>
                             </ui-select-choices>
@@ -470,8 +485,12 @@
                     </div>
                     <div class="form-group">
                         <div class="col-xs-offset-2 col-xs-10">
-                            <button type="submit" class="btn btn-info" ng-click="getDBs()">Test Connection</button>
-                            <button type="submit" class="btn btn-primary" ng-click="saveDB()">Save</button>
+                            <button type="submit" class="btn btn-info has-spinner" ng-class="{'active' : loaderSub}" ng-click="getDBs()">Test Connection
+                                <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+                            </button>
+                            <button type="submit" class="btn btn-primary has-spinner" ng-class="{'active' : loader}" ng-click="saveDB()">Save
+                            <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+                            </button>
                             <button type="submit" class="btn btn-default" ng-click="cancel()">Cancel</button>
                         </div>
                     </div>
@@ -480,13 +499,13 @@
         </div>
     </script>
 
-    <script type="text/ng-template" id="file-explorer.html">        
+    <script type="text/ng-template" id="file-explorer.html">
         <div class="row">
             <!--file explorer-->
             <div class="col-sm-12" id="proj-exp">
                 <div class="panel panel-default">
                     <div class="panel-heading">{{title}}</div>
-                    <div class="panel-body" style="height:400px">                        
+                    <div class="panel-body" style="height:400px">
                         <div id="sidebar_wrapper">
                             <div">
                                 <div class="row">
@@ -502,11 +521,66 @@
                                         <div ui-ace="aceOption" ng-model="fileViewer"></div>
                                     </div>
                                 </div>
-                            </div>
-
                         </div>
+
+                    </div>
                     <div id="sidebar-toggle"></div>
                     <div id="container"></div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="rest-client.html">
+        <div class="row">
+            <!--rest client-->
+            <div class="col-sm-12" id="proj-exp">
+                <div class="panel panel-default">
+                    <div class="panel-heading">REST Client</div>
+                    <div class="panel-body">
+                        <div class="col-sm-2">
+                            <select class="form-control" ng-model="method">
+                                <option ng-repeat="method in ['GET','POST','PUT','DELETE']">{{method}}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" ng-model="uri"/>
+                        </div>
+                        <div class="col-sm-2">
+                            <button class="btn btn-primary has-spinner" ng-class="{'active' : loader}" ng-click="send()">Send
+                                <span class="spinner"><i class="fa fa-spin fa-refresh"></i></span>
+                            </button>
+                        </div>
+                        <div>
+                            <uib-tabset>
+                                <uib-tab heading="Headers">
+                                    <div class="form-inline">
+                                        <input type="text" class="form-control" placeholder="header" ng-model="obj.headerKey" />
+                                        <input type="text" class="form-control" placeholder="value" ng-model="obj.headerVal" />
+                                        <button class="btn btn-default" ng-click="addHeader()">+</button>
+                                    </div>
+                                    <table class="table table-bordered">
+                                        <tr ng-repeat="(key,val) in headers">
+                                            <td><small>{{ key }}</small></td>
+                                            <td><small>{{ val }}</small></td>
+                                            <td width="20px"><button ng-click="removeHeader(key)" class="btn btn-default btn-xs fa fa-trash-o"></button></td>
+                                        </tr>
+                                    </table>
+                                </uib-tab>                                
+                                <uib-tab heading="Body" ng-if="method != 'GET'">
+                                    <div json-editor model="req.data" options="options" style="min-height:200px;"></div>
+                                    <div>
+                                        <label style="font-weight:normal"><input type="checkbox" ng-model="enableString" id="enableString" />String</label>
+                                        <input type="text" ng-model="dataString" />
+                                    </div>
+                                </uib-tab>  
+                                <uib-tab heading="Response" active="result">
+                                    <div ui-ace="aceOption" ng-model="res"></div>
+                                </uib-tab>       
+                            </uib-tabset>     
+                            
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

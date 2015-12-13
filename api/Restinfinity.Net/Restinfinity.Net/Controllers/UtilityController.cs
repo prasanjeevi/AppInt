@@ -33,24 +33,26 @@ namespace Restinfinity.Net.Controllers
         }
 
         //GET: api/Utility
-        public string Get()
+        public string Get(string project = "")
         {
-            return getTemplate();
+            return getTemplate(project);
         }
 
-        string getTemplate()
+        string getTemplate(string project)
         {
+            if (string.IsNullOrEmpty(project)) project = "ProjectName";
+
             StringBuilder template = new StringBuilder();
             template.AppendLine("using System;");
             template.AppendLine("using System.Collections.Generic;");
             template.AppendLine("using System.Linq;");
             template.AppendLine("using System.Web;");
             template.AppendLine();
-            template.AppendLine("using ProjectName.Models;");
-            template.AppendLine("using ProjectName.Utility;");
-            template.AppendLine("using ProjectName.DAL;");
+            template.AppendLine("using " + project + ".Models;");
+            template.AppendLine("using " + project + ".Utility;");
+            template.AppendLine("using " + project + ".DAL;");
             template.AppendLine();
-            template.AppendLine("namespace ProjectName." + Config.Utility);
+            template.AppendLine("namespace " + project + "." + Config.Utility);
             template.AppendLine("{");
             template.AppendLine("public class ClassName");
             template.AppendLine("{");
